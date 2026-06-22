@@ -1,0 +1,21 @@
+node_modules/
+.env*
+*.log
+.DS_Store
+opencode.exe
+
+# Opencode/GSD files to exclude
+.opencode/*
+!.opencode/package.json
+!.opencode/package-lock.json
+!.opencode/.gsd-profile
+!.opencode/skills
+!.opencode/skills/**
+!.opencode/scripts
+!.opencode/scripts/**
+!.opencode/hooks
+!.opencode/hooks/**
+!.opencode/command
+!.opencode/command/**
+!.opencode/gsd-core
+!.opencode/gsd-core/**
