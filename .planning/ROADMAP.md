@@ -16,16 +16,17 @@
 ## Phase Details
 
 ### Phase 1: Project Scaffolding & Data Pipeline
-**Goal:** Developer can clone the repo, preprocess multilingual data with verified BIO alignment, and track experiments in MLflow
+**Goal:** Developer can clone the repo, install dependencies, download all datasets, and explore them via a notebook
 **Mode:** mvp
 **Depends on:** Nothing (first phase)
 **Requirements:** SCAFF-01, SCAFF-02, SCAFF-03, SCAFF-04, SCAFF-05, SCAFF-06, SCAFF-07, SCAFF-08, SCAFF-09, SCAFF-10
 **Success Criteria** (what must be TRUE):
-1. Developer can clone repo, create virtual env, install all dependencies with `pip install -e ".[dev]"`, and pre-commit hooks run on commit
-2. Data download script fetches SemEval 2014 ABSA datasets (laptop + restaurant) and EDA notebook visualizes data/label/language distributions
-3. Hinglish text is correctly normalized via `dhvani` and routed through language detection (English / Hindi / Hinglish)
-4. BIO alignment function passes multilingual unit tests — correct label propagation for SentencePiece subword splits in English, Hindi, and Hinglish
-5. DVC tracks all dataset versions and MLflow tracking server records experiment runs visible in the UI
+1. Full folder structure exists (`src/`, `tests/`, `notebooks/`, `data/`, `models/`, `api/`, `dashboard/`, `scripts/`, `mlflow/`)
+2. `pip install -r requirements.txt` completes without errors for all 25 packages
+3. `python scripts/download_data.py` downloads fasttext LID model, SemEval 2014 restaurants+laptops, and Amazon Hindi reviews — all landing in `data/raw/`
+4. `src/config.py` provides all path constants consumed by downstream modules
+5. DVC tracks `data/raw/` and `data/processed/` directories; `dvc status` reports clean
+6. `notebooks/01_data_exploration.ipynb` skeleton exists with markdown headers for all sections
 **Plans:** TBD
 
 ### Phase 2: Aspect Term Extraction Training
@@ -94,7 +95,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Project Scaffolding & Data Pipeline | 0/0 | Not started | - |
+| 1. Project Scaffolding & Data Pipeline | 0/0 | ◆ Executing | - |
 | 2. Aspect Term Extraction Training | 0/0 | Not started | - |
 | 3. Sentiment Classification Training & Cross-Lingual Evaluation | 0/0 | Not started | - |
 | 4. ONNX Export & Inference API | 0/0 | Not started | - |
