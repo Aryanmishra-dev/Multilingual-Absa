@@ -1,0 +1,11 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "read": {
+      "/Users/theogengineer/Projects/Multilingual-Absa/.opencode/gsd-core/*": "allow"
+    },
+    "external_directory": {
+      "/Users/theogengineer/Projects/Multilingual-Absa/.opencode/gsd-core/*": "allow"
+    }
+  }
+}
