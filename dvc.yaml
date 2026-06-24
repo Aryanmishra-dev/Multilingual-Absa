@@ -1,0 +1,24 @@
+stages:
+  preprocess_semeval:
+    cmd: PYTHONPATH=. python src/data/dataset.py
+    deps:
+      - src/data/dataset.py
+      - src/data/preprocess.py
+      - src/data/lang_detect.py
+      - src/data/transliterate.py
+      - data/raw/semeval_restaurants
+      - data/raw/semeval_laptops
+    outs:
+      - data/processed/semeval_train.jsonl
+      - data/processed/semeval_test.jsonl
+
+  preprocess_hindi:
+    cmd: PYTHONPATH=. python src/data/hindi_loader.py
+    deps:
+      - src/data/hindi_loader.py
+      - src/data/preprocess.py
+      - src/data/lang_detect.py
+      - src/data/transliterate.py
+      - data/raw/amazon_hindi/hindi_sentiment.jsonl
+    outs:
+      - data/processed/amazon_hindi.jsonl
