@@ -15,8 +15,8 @@ def download_fasttext():
 
 def download_semeval():
     print("Downloading SemEval datasets...")
-    restaurants = load_dataset("tomaarsen/absa-semeval-2014-restaurants")
-    laptops = load_dataset("tomaarsen/absa-semeval-2014-laptops")
+    restaurants = load_dataset("tomaarsen/setfit-absa-semeval-restaurants")
+    laptops = load_dataset("tomaarsen/setfit-absa-semeval-laptops")
     
     rest_path = RAW_DIR / "semeval_restaurants"
     lap_path = RAW_DIR / "semeval_laptops"
@@ -29,13 +29,14 @@ def download_semeval():
 
 def download_amazon_hindi():
     print("Downloading Amazon Hindi dataset...")
-    # Load just 5000 from train
-    amz_hi = load_dataset("amazon_reviews_multi", "hi", split="train[:5000]")
+    ds = load_dataset("ai4bharat/IndicSentiment", "translation-hi", 
+                      trust_remote_code=True, split="test")
     
     amz_path = RAW_DIR / "amazon_hindi"
-    amz_hi.save_to_disk(str(amz_path))
-    
-    print(f"Amazon Hindi train samples: {len(amz_hi)}")
+    os.makedirs(amz_path, exist_ok=True)
+    file_path = amz_path / "hindi_sentiment.jsonl"
+    ds.to_json(str(file_path))
+    print(f"Downloaded {len(ds)} Hindi samples")
 
 if __name__ == "__main__":
     os.makedirs(RAW_DIR, exist_ok=True)
