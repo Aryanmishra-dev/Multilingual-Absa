@@ -1,4 +1,4 @@
-transformers==4.39.0
+transformers==4.40.0
 datasets==2.19.0
 torch==2.3.0
 onnxruntime==1.18.0
@@ -12,7 +12,7 @@ pandas==2.2.2
 numpy==1.26.4
 seqeval==1.2.2
 mlflow==2.13.0
-dvc==3.67.1
+dvc==3.51.1
 evidently==0.4.30
 fastapi==0.111.0
 uvicorn==0.29.0
