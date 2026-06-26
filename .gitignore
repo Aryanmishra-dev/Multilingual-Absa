@@ -9,3 +9,4 @@ __pycache__/
 *.pkl
 *.onnx
 node_modules/
+.venv

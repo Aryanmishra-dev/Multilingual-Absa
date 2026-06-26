@@ -12,7 +12,14 @@ def get_model():
     return _model
 
 def detect_language(text: str) -> str:
-    """Detects if text is en, hi, hinglish, or other."""
+    """Detects if text is en, hi, hinglish, or other.
+    
+    Args:
+        text: The text to analyze.
+        
+    Returns:
+        String representing language code ('en', 'hi', 'hinglish', or 'other').
+    """
     if not text or not text.strip():
         return "other"
         

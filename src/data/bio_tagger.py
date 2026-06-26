@@ -2,9 +2,15 @@ import re
 from typing import List, Dict, Any, Tuple
 
 def tokenize(text: str) -> List[Tuple[str, int, int]]:
-    """
-    Tokenizes text by words, returning tokens and their start/end character offsets.
+    """Tokenizes text by words, returning tokens and their start/end character offsets.
+    
     Uses simple regex based tokenization to preserve whitespace semantics for BIO tagging.
+    
+    Args:
+        text: The input text string to tokenize.
+        
+    Returns:
+        List of tuples containing (token_string, start_offset, end_offset).
     """
     tokens = []
     # Match non-whitespace characters

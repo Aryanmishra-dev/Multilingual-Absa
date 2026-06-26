@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: ../docker/Dockerfile.dashboard
+    container_name: absa-dashboard
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_URL=http://api:8000
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: absa-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://absa_user:absa_pass@postgres:5432/absa_db
+      - REDIS_URL=redis://redis:6379/0
+      - MODEL_PATH=models/onnx/
+      - MAX_BATCH_SIZE=10000
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    container_name: absa-worker
+    command: ["celery", "-A", "api.tasks", "worker", "--loglevel=info"]
+    environment:
+      - DATABASE_URL=postgresql://absa_user:absa_pass@postgres:5432/absa_db
+      - REDIS_URL=redis://redis:6379/0
+      - MODEL_PATH=models/onnx/
+    depends_on:
+      - postgres
+      - redis
+      - api
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: absa-postgres
+    environment:
+      - POSTGRES_USER=absa_user
+      - POSTGRES_PASSWORD=absa_pass
+      - POSTGRES_DB=absa_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: absa-redis
+    ports:
+      - "6379:6379"
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports: ["9090:9090"]
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=15d"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports: ["3001:3000"]
+    volumes:
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+
+volumes:
+  postgres_data:
