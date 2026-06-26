@@ -21,6 +21,8 @@ COPY --from=builder /install /usr/local
 # Copy application code
 COPY api /app/api
 COPY scripts /app/scripts
+COPY src /app/src
+COPY config /app/config
 COPY .env.example /app/.env
 
 # Add a non-root user

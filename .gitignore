@@ -1,12 +1,53 @@
-data/raw/
-data/processed/
-data/models/
-models/
+# Credentials & Secrets
+.env
+.env.*
+!.env.example
+config/railway.json
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+credentials.json
+secrets.json
+config.json
+*secret*
+*credential*
+*token*
+*apikey*
+
+# ML/Data artifacts
+/data/
+/models/
+*.pkl
+*.h5
+*.pt
+*.pth
+*.onnx
+*.bin
+mlruns/
 mlflow/
+
+# Runtime & Cache
+.venv/
+venv/
 __pycache__/
 *.pyc
-.env
-*.pkl
-*.onnx
+*.pyo
+.pytest_cache/
+.mypy_cache/
+*.log
+logs/
+test.db
+*.sqlite
+*.db
+.DS_Store
+Thumbs.db
+
+# Docker & Infra
+docker-compose.override.yml
+*-secrets.yml
+*-credentials.yml
+
+# Miscellaneous
 node_modules/
-.venv

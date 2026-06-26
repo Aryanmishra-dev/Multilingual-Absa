@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from src.config import RAW_DIR, AMAZON_HINDI_PATH
+from src.utils.config import RAW_DIR, AMAZON_HINDI_PATH
 from src.data.preprocess import clean
 from src.data.lang_detect import detect_language
 

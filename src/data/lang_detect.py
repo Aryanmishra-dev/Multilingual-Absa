@@ -1,6 +1,7 @@
 import re
 import fasttext
-from src.config import FASTTEXT_MODEL_PATH
+import os
+from src.utils.config import FASTTEXT_MODEL_PATH
 from pathlib import Path
 
 _model = None

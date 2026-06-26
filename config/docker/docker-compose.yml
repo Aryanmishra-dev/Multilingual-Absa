@@ -3,8 +3,8 @@ version: '3.8'
 services:
   dashboard:
     build:
-      context: ./dashboard
-      dockerfile: ../docker/Dockerfile.dashboard
+      context: ../../
+      dockerfile: config/docker/Dockerfile.dashboard
     container_name: absa-dashboard
     ports:
       - "3000:80"
@@ -15,8 +15,8 @@ services:
 
   api:
     build:
-      context: .
-      dockerfile: docker/Dockerfile.api
+      context: ../../
+      dockerfile: config/docker/Dockerfile.api
     container_name: absa-api
     ports:
       - "8000:8000"
@@ -29,13 +29,13 @@ services:
       - postgres
       - redis
     volumes:
-      - ./models:/app/models
-      - ./data:/app/data
+      - ../../models:/app/models
+      - ../../data:/app/data
 
   worker:
     build:
-      context: .
-      dockerfile: docker/Dockerfile.api
+      context: ../../
+      dockerfile: config/docker/Dockerfile.api
     container_name: absa-worker
     command: ["celery", "-A", "api.tasks", "worker", "--loglevel=info"]
     environment:
@@ -47,8 +47,8 @@ services:
       - redis
       - api
     volumes:
-      - ./models:/app/models
-      - ./data:/app/data
+      - ../../models:/app/models
+      - ../../data:/app/data
 
   postgres:
     image: postgres:16-alpine
@@ -71,7 +71,7 @@ services:
   prometheus:
     image: prom/prometheus:latest
     volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ../../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
     ports: ["9090:9090"]
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
@@ -81,8 +81,8 @@ services:
     image: grafana/grafana:latest
     ports: ["3001:3000"]
     volumes:
-      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ../../monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ../../monitoring/grafana/provisioning:/etc/grafana/provisioning
     environment:
       GF_SECURITY_ADMIN_PASSWORD: admin
       GF_USERS_ALLOW_SIGN_UP: "false"

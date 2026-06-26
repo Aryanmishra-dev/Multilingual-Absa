@@ -9,7 +9,7 @@ import time
 
 from api.models.schemas import ReviewInput, PredictionResponse, BatchJobResponse
 from api.models.db_models import Review, AspectResult, BatchJob
-from api.dependencies import get_db
+from api.middleware.dependencies import get_db
 from api.services.absa_pipeline import pipeline
 from api.tasks.batch_tasks import process_batch
 

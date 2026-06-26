@@ -1,12 +1,17 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
+from prometheus_fastapi_instrumentator import Instrumentator
 
-from api.routers import predict, results
+from api.routes import predict, results
 from api.middleware.metrics import instrumentator
 from api.services.absa_pipeline import pipeline
 from api.models.db_models import Base
-from api.dependencies import engine
+from api.middleware.dependencies import engine
+
+# Create DB tables (if using simple SQLite, otherwise use Alembic)
+Base.metadata.create_all(bind=engine)
 
 load_dotenv()
 

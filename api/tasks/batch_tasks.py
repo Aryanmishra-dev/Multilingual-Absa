@@ -1,6 +1,6 @@
 from api.tasks import celery_app
 from api.services.absa_pipeline import pipeline
-from api.dependencies import SessionLocal
+from api.middleware.dependencies import SessionLocal
 from api.models.db_models import BatchJob, AspectResult, Review
 import pandas as pd
 import os

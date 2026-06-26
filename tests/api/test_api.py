@@ -44,7 +44,7 @@ def test_batch_upload():
     with TestClient(app) as client:
         csv_content = "text\nThe food was great\nTerrible service"
         files = {"file": ("test.csv", io.BytesIO(csv_content.encode("utf-8")), "text/csv")}
-        with mock.patch("api.routers.predict.process_batch.delay") as mock_delay:
+        with mock.patch("api.routes.predict.process_batch.delay") as mock_delay:
             response = client.post("/batch", files=files)
             assert response.status_code == 200
             data = response.json()

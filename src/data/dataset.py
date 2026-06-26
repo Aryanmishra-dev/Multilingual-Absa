@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from datasets import load_from_disk
 from collections import defaultdict
-from src.config import RAW_DIR, SEMEVAL_TRAIN_PATH, SEMEVAL_TEST_PATH
+from src.utils.config import RAW_DIR, SEMEVAL_TRAIN_PATH, SEMEVAL_TEST_PATH
 from src.data.preprocess import clean
 from src.data.lang_detect import detect_language
 
