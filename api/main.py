@@ -2,7 +2,6 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi.middleware.cors import CORSMiddleware
-from prometheus_fastapi_instrumentator import Instrumentator
 
 load_dotenv()
 
@@ -11,6 +10,7 @@ from api.middleware.metrics import instrumentator
 from api.services.absa_pipeline import pipeline
 from api.models.db_models import Base
 from api.middleware.dependencies import engine
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -25,11 +25,12 @@ async def lifespan(app: FastAPI):
     # Shutdown
     print("Shutting down...")
 
+
 app = FastAPI(
     title="Multilingual ABSA API",
     description="Aspect-Based Sentiment Analysis for English and Hindi",
     version="1.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 # Allow the dashboard (and any origin in dev) to call the API

@@ -22,6 +22,13 @@ The system leverages state-of-the-art models like **XLM-RoBERTa** and **IndicBER
 - **MLOps Integrated**: Complete integration with DVC (Data Version Control) for pipeline reproducibility, MLflow for experiment tracking, and Evidently AI for data drift monitoring.
 - **Scalable Architecture**: Support for async tasks via Celery + Redis, robust data storage via PostgreSQL, and metric exporting using Prometheus.
 
+## 🐍 Python-First Architecture
+
+This repository is designed following a **Python-first paradigm**:
+- **Python (67.5%)**: Handling all business logic, data processing, configuration, API routing, ML inference, and utility functions using FastAPI and Python data science libraries.
+- **JavaScript/TypeScript (32.5%)**: Strictly limited to the frontend `dashboard/` directory, used *only* for the React UI, component rendering, browser events, and client-side state. 
+- *Note: There is no backend or ML logic written in JavaScript.*
+
 ## 🏗️ Repository Structure
 
 ```text

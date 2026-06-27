@@ -28,90 +28,297 @@ try:
         ORTModelForSequenceClassification,
     )
     from transformers import AutoTokenizer
+
     OPTIMUM_AVAILABLE = True
 except ImportError:
     try:
         from transformers import AutoTokenizer
+
         OPTIMUM_AVAILABLE = False
     except ImportError:
         OPTIMUM_AVAILABLE = False
 
 # ── Aspect keyword lexicon ────────────────────────────────────────────────────
 # Ordered longest-first so multi-word matches win over single words.
-ASPECT_PHRASES: List[str] = sorted([
-    # Audio
-    "sound quality", "audio quality", "bass response", "bass", "treble",
-    "noise cancellation", "active noise cancellation", "anc", "passive noise isolation",
-    "microphone quality", "microphone", "mic", "speakers", "speaker",
-    "audio", "sound", "volume",
-    # Battery / Power
-    "battery life", "battery performance", "charging speed", "fast charging",
-    "wireless charging", "charging case", "battery", "charging", "power",
-    # Design / Build
-    "build quality", "build", "design", "comfort", "fit and finish",
-    "ergonomics", "weight", "size", "material", "finish", "durability",
-    # Connectivity
-    "bluetooth connectivity", "bluetooth", "wifi", "wi-fi", "connectivity",
-    "wireless connection", "pairing", "latency", "lag",
-    # Display
-    "display quality", "screen quality", "display", "screen", "resolution",
-    "brightness", "touchscreen",
-    # Camera
-    "camera quality", "image quality", "video quality", "camera", "lens", "photo",
-    # Performance
-    "performance", "processing speed", "speed", "processor", "ram", "memory",
-    "loading time",
-    # Software / Features
-    "user interface", "software", "app", "features", "controls", "buttons",
-    "touch controls",
-    # Value
-    "value for money", "price", "cost", "value",
-    # Support / Delivery
-    "customer service", "customer support", "warranty", "delivery", "packaging",
-    # General
-    "quality", "reliability", "overall experience",
-], key=len, reverse=True)
+ASPECT_PHRASES: List[str] = sorted(
+    [
+        # Audio
+        "sound quality",
+        "audio quality",
+        "bass response",
+        "bass",
+        "treble",
+        "noise cancellation",
+        "active noise cancellation",
+        "anc",
+        "passive noise isolation",
+        "microphone quality",
+        "microphone",
+        "mic",
+        "speakers",
+        "speaker",
+        "audio",
+        "sound",
+        "volume",
+        # Battery / Power
+        "battery life",
+        "battery performance",
+        "charging speed",
+        "fast charging",
+        "wireless charging",
+        "charging case",
+        "battery",
+        "charging",
+        "power",
+        # Design / Build
+        "build quality",
+        "build",
+        "design",
+        "comfort",
+        "fit and finish",
+        "ergonomics",
+        "weight",
+        "size",
+        "material",
+        "finish",
+        "durability",
+        # Connectivity
+        "bluetooth connectivity",
+        "bluetooth",
+        "wifi",
+        "wi-fi",
+        "connectivity",
+        "wireless connection",
+        "pairing",
+        "latency",
+        "lag",
+        # Display
+        "display quality",
+        "screen quality",
+        "display",
+        "screen",
+        "resolution",
+        "brightness",
+        "touchscreen",
+        # Camera
+        "camera quality",
+        "image quality",
+        "video quality",
+        "camera",
+        "lens",
+        "photo",
+        # Performance
+        "performance",
+        "processing speed",
+        "speed",
+        "processor",
+        "ram",
+        "memory",
+        "loading time",
+        # Software / Features
+        "user interface",
+        "software",
+        "app",
+        "features",
+        "controls",
+        "buttons",
+        "touch controls",
+        # Value
+        "value for money",
+        "price",
+        "cost",
+        "value",
+        # Support / Delivery
+        "customer service",
+        "customer support",
+        "warranty",
+        "delivery",
+        "packaging",
+        # General
+        "quality",
+        "reliability",
+        "overall experience",
+    ],
+    key=len,
+    reverse=True,
+)
 
 # ── Sentiment lexicon ─────────────────────────────────────────────────────────
 POSITIVE_WORDS = {
-    "excellent", "great", "amazing", "outstanding", "superb", "fantastic",
-    "wonderful", "perfect", "impressive", "exceptional", "brilliant", "splendid",
-    "good", "nice", "solid", "strong", "reliable", "consistent", "smooth",
-    "clear", "crisp", "rich", "deep", "powerful", "comfortable", "enjoyable",
-    "satisfied", "happy", "love", "loved", "like", "loved", "commendable",
-    "recommend", "recommended", "worth", "affordable", "value", "effective",
-    "efficient", "accurate", "precise", "sharp", "vibrant", "vivid",
-    "fast", "quick", "snappy", "instant", "stable", "durable", "sturdy",
-    "premium", "high-quality", "high quality", "top-notch", "top notch",
-    "long", "lasting", "enduring", "impressive", "praise", "appreciate",
+    "excellent",
+    "great",
+    "amazing",
+    "outstanding",
+    "superb",
+    "fantastic",
+    "wonderful",
+    "perfect",
+    "impressive",
+    "exceptional",
+    "brilliant",
+    "splendid",
+    "good",
+    "nice",
+    "solid",
+    "strong",
+    "reliable",
+    "consistent",
+    "smooth",
+    "clear",
+    "crisp",
+    "rich",
+    "deep",
+    "powerful",
+    "comfortable",
+    "enjoyable",
+    "satisfied",
+    "happy",
+    "love",
+    "loved",
+    "like",
+    "loved",
+    "commendable",
+    "recommend",
+    "recommended",
+    "worth",
+    "affordable",
+    "value",
+    "effective",
+    "efficient",
+    "accurate",
+    "precise",
+    "sharp",
+    "vibrant",
+    "vivid",
+    "fast",
+    "quick",
+    "snappy",
+    "instant",
+    "stable",
+    "durable",
+    "sturdy",
+    "premium",
+    "high-quality",
+    "high quality",
+    "top-notch",
+    "top notch",
+    "long",
+    "lasting",
+    "enduring",
+    "impressive",
+    "praise",
+    "appreciate",
     # Hindi positive (transliterated)
-    "badhiya", "achha", "accha", "shandar", "zabardast", "mast",
+    "badhiya",
+    "achha",
+    "accha",
+    "shandar",
+    "zabardast",
+    "mast",
 }
 
 NEGATIVE_WORDS = {
-    "bad", "poor", "terrible", "awful", "horrible", "dreadful", "atrocious",
-    "disappointing", "disappointed", "mediocre", "weak", "subpar", "inferior",
-    "cheap", "flimsy", "fragile", "unreliable", "inconsistent", "unstable",
-    "slow", "sluggish", "laggy", "lag", "delay", "delayed", "glitchy", "buggy",
-    "noisy", "distorted", "muffled", "blurry", "dim", "dull", "flat",
-    "short", "low", "limited", "lacking", "missing", "absent",
-    "expensive", "overpriced", "pricey", "costly",
-    "uncomfortable", "annoying", "frustrating", "irritating",
-    "failed", "failure", "broken", "defective", "faulty",
-    "average", "ordinary", "basic", "minimal",
+    "bad",
+    "poor",
+    "terrible",
+    "awful",
+    "horrible",
+    "dreadful",
+    "atrocious",
+    "disappointing",
+    "disappointed",
+    "mediocre",
+    "weak",
+    "subpar",
+    "inferior",
+    "cheap",
+    "flimsy",
+    "fragile",
+    "unreliable",
+    "inconsistent",
+    "unstable",
+    "slow",
+    "sluggish",
+    "laggy",
+    "lag",
+    "delay",
+    "delayed",
+    "glitchy",
+    "buggy",
+    "noisy",
+    "distorted",
+    "muffled",
+    "blurry",
+    "dim",
+    "dull",
+    "flat",
+    "short",
+    "low",
+    "limited",
+    "lacking",
+    "missing",
+    "absent",
+    "expensive",
+    "overpriced",
+    "pricey",
+    "costly",
+    "uncomfortable",
+    "annoying",
+    "frustrating",
+    "irritating",
+    "failed",
+    "failure",
+    "broken",
+    "defective",
+    "faulty",
+    "average",
+    "ordinary",
+    "basic",
+    "minimal",
     # Hindi negative (transliterated)
-    "kharab", "bekaar", "bura", "ganda", "faltu",
+    "kharab",
+    "bekaar",
+    "bura",
+    "ganda",
+    "faltu",
 }
 
 NEGATION_WORDS = {
-    "not", "no", "never", "neither", "nor", "barely", "hardly", "scarcely",
-    "doesn't", "don't", "didn't", "isn't", "aren't", "wasn't", "weren't",
-    "without", "lack", "lacks", "lacking", "failed", "fails",
+    "not",
+    "no",
+    "never",
+    "neither",
+    "nor",
+    "barely",
+    "hardly",
+    "scarcely",
+    "doesn't",
+    "don't",
+    "didn't",
+    "isn't",
+    "aren't",
+    "wasn't",
+    "weren't",
+    "without",
+    "lack",
+    "lacks",
+    "lacking",
+    "failed",
+    "fails",
 }
 
 INTENSIFIERS = {
-    "very", "extremely", "incredibly", "absolutely", "truly", "really",
-    "highly", "remarkably", "exceptionally", "super", "too",
+    "very",
+    "extremely",
+    "incredibly",
+    "absolutely",
+    "truly",
+    "really",
+    "highly",
+    "remarkably",
+    "exceptionally",
+    "super",
+    "too",
 }
 
 
@@ -126,7 +333,7 @@ def _score_sentence(sentence: str) -> Tuple[float, float]:
     while i < len(words):
         w = words[i]
         # Look-back for negation in previous 3 words
-        context = words[max(0, i - 3):i]
+        context = words[max(0, i - 3) : i]
         negated = any(n in context for n in NEGATION_WORDS)
         # Look-back for intensifier
         intensity = 1.5 if any(t in context for t in INTENSIFIERS) else 1.0
@@ -162,6 +369,7 @@ def _score_to_label(pos: float, neg: float) -> Tuple[str, float]:
 
 # ── Main pipeline class ───────────────────────────────────────────────────────
 
+
 class ABSAPipeline:
     def __init__(self):
         self.tokenizer = None
@@ -171,7 +379,12 @@ class ABSAPipeline:
         self._lock = threading.Lock()
 
         self.id2label = {0: "O", 1: "B-ASP", 2: "I-ASP"}
-        self.sentiment_id2label = {0: "positive", 1: "negative", 2: "neutral", 3: "conflict"}
+        self.sentiment_id2label = {
+            0: "positive",
+            1: "negative",
+            2: "neutral",
+            3: "conflict",
+        }
 
     def load_models(self):
         """Try to load custom ONNX models; mark ready immediately (no downloads)."""
@@ -186,8 +399,10 @@ class ABSAPipeline:
                 self.aspect_model = ORTModelForTokenClassification.from_pretrained(
                     hf_repo_id, subfolder="aspect_extraction_int8"
                 )
-                self.sentiment_model = ORTModelForSequenceClassification.from_pretrained(
-                    hf_repo_id, subfolder="sentiment_int8"
+                self.sentiment_model = (
+                    ORTModelForSequenceClassification.from_pretrained(
+                        hf_repo_id, subfolder="sentiment_int8"
+                    )
                 )
                 print("Custom ONNX models loaded.")
             except Exception as e:
@@ -205,8 +420,14 @@ class ABSAPipeline:
                 try:
                     print(f"Loading custom ONNX models from {model_path_base}")
                     self.tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-base")
-                    self.aspect_model = ORTModelForTokenClassification.from_pretrained(str(aspect_path))
-                    self.sentiment_model = ORTModelForSequenceClassification.from_pretrained(str(sentiment_path))
+                    self.aspect_model = ORTModelForTokenClassification.from_pretrained(
+                        str(aspect_path)
+                    )
+                    self.sentiment_model = (
+                        ORTModelForSequenceClassification.from_pretrained(
+                            str(sentiment_path)
+                        )
+                    )
                     print("Custom ONNX models loaded.")
                 except Exception as e:
                     print(f"Custom model load skipped: {e}")
@@ -240,13 +461,19 @@ class ABSAPipeline:
     # ── Custom ONNX path ──────────────────────────────────────────────────────
 
     def _predict_onnx(self, text: str) -> List[AspectSentiment]:
-        inputs = self.tokenizer(text, return_tensors="pt", truncation=True, max_length=128)
+        inputs = self.tokenizer(
+            text, return_tensors="pt", truncation=True, max_length=128
+        )
         logits = self.aspect_model(**inputs).logits[0].detach().numpy()
         preds = np.argmax(logits, axis=1)
         tokens = self.tokenizer.convert_ids_to_tokens(inputs["input_ids"][0])
 
         raw, current, start_idx = [], [], -1
-        skip = {self.tokenizer.cls_token, self.tokenizer.sep_token, self.tokenizer.pad_token}
+        skip = {
+            self.tokenizer.cls_token,
+            self.tokenizer.sep_token,
+            self.tokenizer.pad_token,
+        }
         for idx, (tok, pred) in enumerate(zip(tokens, preds)):
             if tok in skip:
                 continue
@@ -266,18 +493,26 @@ class ABSAPipeline:
 
         results = []
         for asp_text, s, e in raw:
-            seq_in = self.tokenizer(text, text_pair=asp_text, return_tensors="pt",
-                                     truncation=True, max_length=128)
+            seq_in = self.tokenizer(
+                text,
+                text_pair=asp_text,
+                return_tensors="pt",
+                truncation=True,
+                max_length=128,
+            )
             sent_logits = self.sentiment_model(**seq_in).logits[0].detach().numpy()
             exp = np.exp(sent_logits - sent_logits.max())
             probs = exp / exp.sum()
             cls = int(np.argmax(probs))
-            results.append(AspectSentiment(
-                aspect=asp_text,
-                sentiment=self.sentiment_id2label.get(cls, "neutral"),
-                confidence=round(float(probs[cls]), 3),
-                start=s, end=e,
-            ))
+            results.append(
+                AspectSentiment(
+                    aspect=asp_text,
+                    sentiment=self.sentiment_id2label.get(cls, "neutral"),
+                    confidence=round(float(probs[cls]), 3),
+                    start=s,
+                    end=e,
+                )
+            )
         return results
 
     # ── Rule-based path ───────────────────────────────────────────────────────
@@ -291,9 +526,9 @@ class ABSAPipeline:
         for aspect_label, start_char, end_char in found_aspects:
             # Find the sentence(s) mentioning this aspect for focused scoring
             aspect_lower = aspect_label.lower()
-            context_sentences = [
-                s for s in sentences if aspect_lower in s.lower()
-            ] or [text]
+            context_sentences = [s for s in sentences if aspect_lower in s.lower()] or [
+                text
+            ]
             context = " ".join(context_sentences)
 
             pos, neg = _score_sentence(context)
@@ -304,13 +539,15 @@ class ABSAPipeline:
             neg += full_neg * 0.3
 
             sentiment, confidence = _score_to_label(pos, neg)
-            results.append(AspectSentiment(
-                aspect=aspect_label,
-                sentiment=sentiment,
-                confidence=confidence,
-                start=start_char,
-                end=end_char,
-            ))
+            results.append(
+                AspectSentiment(
+                    aspect=aspect_label,
+                    sentiment=sentiment,
+                    confidence=confidence,
+                    start=start_char,
+                    end=end_char,
+                )
+            )
         return results
 
     def _extract_aspects(self, text_lower: str) -> List[Tuple[str, int, int]]:

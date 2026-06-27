@@ -7,7 +7,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: "3.11"}
-      - run: pip install -r requirements.txt
+      - run: pip install -r requirements.txt mypy
       - run: PYTHONPATH=. pytest tests/ -v --tb=short
       - run: PYTHONPATH=. python -m mypy src/ --ignore-missing-imports
 
@@ -33,6 +33,6 @@ jobs:
       - uses: docker/build-push-action@v5
         with:
           context: .
-          file: docker/Dockerfile.api.prod
+          file: config/docker/Dockerfile.api.prod
           push: ${{github.ref == 'refs/heads/main'}}
           tags: ghcr.io/${{github.repository}}/api:latest

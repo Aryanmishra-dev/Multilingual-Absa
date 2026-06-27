@@ -1,6 +1,6 @@
 import fasttext
-import os
 from pathlib import Path
+
 
 class LanguageService:
     def __init__(self):
@@ -15,16 +15,17 @@ class LanguageService:
     def detect_language(self, text: str) -> str:
         if self.model:
             predictions = self.model.predict(text.replace("\n", " "), k=1)
-            lang = predictions[0][0].replace('__label__', '')
-            if lang in ['en', 'hi']:
+            lang = predictions[0][0].replace("__label__", "")
+            if lang in ["en", "hi"]:
                 return lang
             # Default to en if unknown or other
-            return 'en'
+            return "en"
         else:
             # Simple heuristic fallback
-            hindi_chars = sum(1 for c in text if '\u0900' <= c <= '\u097F')
+            hindi_chars = sum(1 for c in text if "\u0900" <= c <= "\u097f")
             if hindi_chars > 0:
-                return 'hi'
-            return 'en'
+                return "hi"
+            return "en"
+
 
 lang_service = LanguageService()
