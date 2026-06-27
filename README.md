@@ -1,53 +1,113 @@
-## Project Overview
-Multilingual Aspect-Based Sentiment Analysis (ABSA) supporting English, Hindi, and Hinglish. It leverages XLM-RoBERTa and IndicBERT to perform aspect term extraction and sentiment classification for multilingual product reviews.
+# Multilingual Aspect-Based Sentiment Analysis (ABSA)
 
-## Repo Structure
+![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.111.0-00a393.svg)
+![React](https://img.shields.io/badge/React-18-61dafb.svg)
+![DVC](https://img.shields.io/badge/DVC-3.51.1-945dd6.svg)
+![MLflow](https://img.shields.io/badge/MLflow-2.13.0-0194E2.svg)
+
+A production-ready, highly optimized Aspect-Based Sentiment Analysis (ABSA) system designed to process multilingual product reviews in **English, Hindi, and Hinglish**. It accurately extracts aspects and classifies their underlying sentiments.
+
+The system leverages state-of-the-art models like **XLM-RoBERTa** and **IndicBERT**, optimized using ONNX runtime, and includes a highly robust, zero-download, pure-Python rule-based fallback engine for instant inference.
+
+## ✨ Key Features
+
+- **Multilingual Support**: First-class support for English, Hindi, and code-mixed Hinglish.
+- **Dual Inference Engine**:
+  - **Neural Path**: Uses custom fine-tuned, INT8-quantized ONNX models (XLM-RoBERTa based) for extremely fast and accurate token classification and sequence classification.
+  - **Rule-Based Fallback**: An instantaneous, pure-Python fallback leveraging a curated multi-lingual lexicon to handle aspect extraction and sentiment scoring without any heavy downloads.
+- **Modern Tech Stack**: 
+  - **Backend**: Asynchronous, high-performance API built with FastAPI.
+  - **Frontend**: A sleek, responsive dashboard built with React and TailwindCSS. Features real-time predictions, batch analytics, and system monitoring.
+- **MLOps Integrated**: Complete integration with DVC (Data Version Control) for pipeline reproducibility, MLflow for experiment tracking, and Evidently AI for data drift monitoring.
+- **Scalable Architecture**: Support for async tasks via Celery + Redis, robust data storage via PostgreSQL, and metric exporting using Prometheus.
+
+## 🏗️ Repository Structure
+
+```text
 Multilingual-Absa/
-├── .github/
-│   └── workflows/          # CI/CD pipelines
-├── config/                 # Configuration files
-│   ├── docker/             # docker-compose.yml, docker-compose.prod.yml
-│   └── dvc.yaml            # DVC pipeline config
-├── src/                    # ML source code
-├── api/                    # API source code
-├── dashboard/              # Frontend dashboard
-├── tests/                  # All tests
-├── scripts/                # Utility/automation scripts
-├── notebooks/              # Jupyter notebooks
-├── docs/                   # Documentation
-├── data/                   # Gitignored, DVC-tracked only
-├── models/                 # Gitignored, DVC-tracked only
-├── .dvcignore
-├── .env.example            # Template only
-├── .gitignore
-├── .gitattributes
-├── AGENTS.md
-├── README.md
-├── requirements.txt
-├── railway.json            # GITIGNORED, stays local only
-└── dvc.lock
+├── .github/workflows/      # CI/CD pipelines
+├── api/                    # FastAPI backend and inference services
+├── config/                 # DVC and Docker configuration files
+├── dashboard/              # React frontend for inference & monitoring
+├── data/                   # Dataset directory (DVC-tracked)
+├── docs/                   # Extended documentation
+├── mlflow/                 # MLflow tracking
+├── models/                 # Model artifacts (DVC-tracked)
+├── monitoring/             # Monitoring configurations (Prometheus, Evidently)
+├── notebooks/              # Exploratory Data Analysis & Prototyping
+├── scripts/                # Utility and automation scripts
+├── src/                    # Machine Learning pipeline source code
+├── tests/                  # Unit and integration test suite
+└── requirements.txt        # Python dependencies
+```
 
-## Setup
+## 🚀 Getting Started
+
+### Prerequisites
+- Python 3.10+
+- Node.js (for Dashboard)
+- Docker & Docker Compose (Optional, but recommended)
+
+### 1. Local Setup
+
+Clone the repository and install the backend dependencies:
 ```bash
-# 1. Clone and install
 git clone <repository-url>
+cd Multilingual-Absa
+
+# Create a virtual environment and install dependencies
+python -m venv .venv
+source .venv/bin/activate  # On Windows use `.venv\Scripts\activate`
 pip install -r requirements.txt
+```
 
-# 2. Copy env template
+Set up your environment variables:
+```bash
 cp .env.example .env
-# Fill in your values in .env
-
-# 3. Run with Docker
-docker-compose -f config/docker/docker-compose.yml up
+# Edit .env with your specific configurations
 ```
 
-## ML Pipeline (DVC)
+### 2. Run with Docker (Recommended)
+
+The easiest way to get the entire stack (API, Dashboard, Redis, Postgres) running is via Docker Compose:
 ```bash
-dvc repro        # Run full pipeline
-dvc push         # Push data/models to remote
+docker-compose -f config/docker/docker-compose.yml up --build
 ```
 
-## API
+### 3. Manual ML Pipeline Execution (DVC)
+
+To reproduce the ML pipeline or sync artifacts:
 ```bash
-cd api && uvicorn main:app --reload
+dvc pull         # Pull data/models from remote storage
+dvc repro        # Run the full end-to-end ML training pipeline
+dvc push         # Push newly generated artifacts to remote
 ```
+
+### 4. Running the Application Locally
+
+**Start the API Server:**
+```bash
+cd api
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+*API Documentation will be available at `http://localhost:8000/docs`.*
+
+**Start the Dashboard:**
+```bash
+cd dashboard
+npm install
+npm run dev
+```
+*Access the dashboard at `http://localhost:5173`.*
+
+## 🔬 How it Works
+
+1. **Prediction API**: When a review is submitted, the language is auto-detected.
+2. **Inference**: The `ABSAPipeline` attempts to load INT8 quantized ONNX models for extraction and sentiment scoring. 
+3. **Fallback Mechanism**: If the custom models are not downloaded, the engine automatically falls back to a dictionary/rule-based engine tailored for product reviews, guaranteeing zero downtime and instant availability.
+4. **Monitoring**: All predictions are logged. Performance metrics and data drift are tracked via Evidently and Prometheus.
+
+## 🛡️ License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
