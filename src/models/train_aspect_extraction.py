@@ -30,11 +30,11 @@ def compute_metrics(p):
     label_map = {0: "O", 1: "B-ASP", 2: "I-ASP"}
 
     true_predictions = [
-        [label_map[p] for (p, l) in zip(prediction, label) if l != -100]
+        [label_map[p] for (p, lbl) in zip(prediction, label) if lbl != -100]
         for prediction, label in zip(predictions, labels)
     ]
     true_labels = [
-        [label_map[l] for (p, l) in zip(prediction, label) if l != -100]
+        [label_map[lbl] for (p, lbl) in zip(prediction, label) if lbl != -100]
         for prediction, label in zip(predictions, labels)
     ]
 

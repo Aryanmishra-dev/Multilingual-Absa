@@ -6,6 +6,7 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import f1_score, confusion_matrix, classification_report
+from sklearn.model_selection import train_test_split
 import mlflow
 from src.training.mlflow_utils import log_training_run
 
@@ -45,9 +46,6 @@ def extract_sentence_sentiment(df: pd.DataFrame) -> pd.DataFrame:
             if polarity in sentiment_map:
                 records.append({"text": text, "label": sentiment_map[polarity]})
     return pd.DataFrame(records)
-
-
-from sklearn.model_selection import train_test_split
 
 
 def main():

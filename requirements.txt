@@ -4,7 +4,7 @@ torch==2.3.0
 onnxruntime==1.18.0
 optimum[onnxruntime]==1.19.0
 peft==0.10.0
-fasttext-wheel==0.9.2
+fasttext-predict==0.9.2.4
 indic-nlp-library @ git+https://github.com/anoopkunchukuttan/indic_nlp_library.git
 nlpaug==1.1.11
 scikit-learn==1.4.2

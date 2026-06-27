@@ -1,4 +1,4 @@
-import mlflow
+import mlflow  # type: ignore
 from typing import Dict, Any, Optional, Union
 from pathlib import Path
 
@@ -36,14 +36,14 @@ def log_training_run(
     """
     setup_mlflow()
 
-    with mlflow.start_run(run_name=run_name) as run:
-        mlflow.log_params(params)
-        mlflow.log_metrics(metrics)
+    with mlflow.start_run(run_name=run_name) as run:  # type: ignore[attr-defined]
+        mlflow.log_params(params)  # type: ignore[attr-defined]
+        mlflow.log_metrics(metrics)  # type: ignore[attr-defined]
 
         if model_path:
             model_path_obj = Path(model_path)
             if model_path_obj.exists():
-                mlflow.log_artifact(str(model_path_obj), artifact_path="model")
+                mlflow.log_artifact(str(model_path_obj), artifact_path="model")  # type: ignore[attr-defined]
             else:
                 print(
                     f"Warning: Model path {model_path} does not exist. Artifact not logged."
@@ -54,7 +54,7 @@ def log_training_run(
 
 def get_best_run(
     metric: str = "eval_macro_f1", ascending: bool = False
-) -> Optional[Any]: # type: ignore
+) -> Optional[Any]:  # type: ignore
     """
     Retrieves the best run from the experiment based on a specific metric.
 
@@ -67,11 +67,11 @@ def get_best_run(
     """
     setup_mlflow()
 
-    experiment = mlflow.get_experiment_by_name(EXPERIMENT_NAME)
+    experiment = mlflow.get_experiment_by_name(EXPERIMENT_NAME)  # type: ignore[attr-defined]
     if not experiment:
         return None
 
-    runs = mlflow.search_runs(
+    runs = mlflow.search_runs(  # type: ignore[attr-defined]
         experiment_ids=[experiment.experiment_id],
         order_by=[f"metrics.{metric} {'ASC' if ascending else 'DESC'}"],
         max_results=1,

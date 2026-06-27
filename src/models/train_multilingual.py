@@ -33,14 +33,14 @@ class LanguageAwareTrainer(Trainer):
         # Calculate weights to achieve 1:1 English:Hindi ratio
         # Assuming dataset has a 'lang' feature
         lang_labels = dataset["lang"]
-        en_count = sum(1 for l in lang_labels if l == "en")
-        hi_count = sum(1 for l in lang_labels if l == "hi")
+        en_count = sum(1 for lang in lang_labels if lang == "en")
+        hi_count = sum(1 for lang in lang_labels if lang == "hi")
 
         weights = []
-        for l in lang_labels:
-            if l == "en":
+        for lang in lang_labels:
+            if lang == "en":
                 weights.append(1.0 / en_count if en_count > 0 else 0)
-            elif l == "hi":
+            elif lang == "hi":
                 weights.append(1.0 / hi_count if hi_count > 0 else 0)
             else:
                 weights.append(0)
@@ -108,7 +108,7 @@ def main():
         save_strategy="epoch",
     )
 
-    trainer = LanguageAwareTrainer(
+    LanguageAwareTrainer(
         model=model,
         args=training_args,
         train_dataset=tokenized_train,

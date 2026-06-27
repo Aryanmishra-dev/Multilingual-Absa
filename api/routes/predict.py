@@ -18,7 +18,7 @@ router = APIRouter()
 @router.post("/predict", response_model=PredictionResponse)
 async def predict(request: ReviewInput, db: Session = Depends(get_db)):
     try:
-        start_time = time.time()
+        time.time()
 
         # Inference
         prediction = pipeline.predict(request.text, request.language)

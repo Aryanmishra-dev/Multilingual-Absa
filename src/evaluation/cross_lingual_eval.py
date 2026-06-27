@@ -47,7 +47,7 @@ def main():
 
     device = 0 if torch.cuda.is_available() else -1
 
-    ner_pipeline = pipeline(
+    pipeline(
         "token-classification",
         model=aspect_model,
         tokenizer=tokenizer,
@@ -61,7 +61,6 @@ def main():
 
     print(f"Evaluating zero-shot on {len(hindi_data)} Hindi samples...")
 
-    sentiment_map_rev = {0: "positive", 1: "negative", 2: "neutral", 3: "conflict"}
     sentiment_map = {"positive": 0, "negative": 1, "neutral": 2, "conflict": 3}
 
     true_labels = []

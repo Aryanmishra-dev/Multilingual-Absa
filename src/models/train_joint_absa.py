@@ -140,7 +140,7 @@ class JointTrainer(Trainer):
 def compute_metrics(eval_pred) -> dict:
     # eval_pred.predictions is a tuple: (ner_logits, cls_logits)
     ner_logits, cls_logits = eval_pred.predictions
-    ner_labels = eval_pred.label_ids[
+    eval_pred.label_ids[
         0
     ]  # assuming we package them or trainer passes first
     sentiment_labels = (
@@ -170,12 +170,12 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     print("Loading tokenizer and model...")
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    model = JointABSAModel.from_pretrained(
+    AutoTokenizer.from_pretrained(model_name)
+    JointABSAModel.from_pretrained(
         model_name, num_ner_labels=3, num_sentiment_labels=4
     )
 
-    training_args = TrainingArguments(
+    TrainingArguments(
         output_dir=str(output_dir),
         evaluation_strategy="epoch",
         learning_rate=2e-5,
