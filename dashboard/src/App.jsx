@@ -9,12 +9,11 @@ import Monitor from './pages/Monitor'
 function App() {
   return (
     <BrowserRouter>
-      <Toaster position="top-right" />
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="/predict" replace />} />
           <Route path="predict" element={<Predict />} />
-          <Route path="analytics" element={<Analytics />} />
+          <Route path="batch" element={<Analytics />} />
           <Route path="monitor" element={<Monitor />} />
         </Route>
       </Routes>

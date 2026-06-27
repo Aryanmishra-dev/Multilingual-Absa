@@ -6,6 +6,7 @@ COPY requirements.txt .
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
@@ -23,7 +24,8 @@ COPY api /app/api
 COPY scripts /app/scripts
 COPY src /app/src
 COPY config /app/config
-COPY .env.example /app/.env
+COPY .env.example /app/.env.example
+# .env is injected via docker-compose environment vars — no need to COPY it
 
 # Add a non-root user
 RUN adduser --disabled-password --gecos "" absauser \
