@@ -23,10 +23,7 @@
 *Action*: Switch tabs to the Grafana dashboard (`localhost:3001` or deployed URL).
 *Narration*: "Production reliability is crucial. Here we see our Prometheus metrics scraped from FastAPI: request rates, P95 latency consistently under 200ms, and Celery worker health."
 
-**02:45 — Show GitHub Actions CI/CD green checks**
-*Action*: Switch tabs to the GitHub Actions page.
-*Narration*: "Every push goes through a rigorous CI/CD pipeline—testing, linting, Docker builds, and automated deployments to Railway and Vercel."
-
-**03:00 — Show HuggingFace Hub model page**
+**02:45 — Show HuggingFace Hub model page**
 *Action*: Switch to the HuggingFace Hub repository.
 *Narration*: "Finally, our optimized INT8 ONNX models are hosted publicly on HuggingFace Hub. Thank you for watching!"
+

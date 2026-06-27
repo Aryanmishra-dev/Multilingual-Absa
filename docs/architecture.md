@@ -28,15 +28,3 @@ graph LR
   F --> G[Stage 2: Sentiment Classifier]
   G --> H[aspect, sentiment, confidence]
 ```
-
-## 3. CI/CD Pipeline
-```mermaid
-graph LR
-  A[git push] --> B[GitHub Actions]
-  B --> C[pytest + ruff]
-  C --> D[Docker build]
-  D --> E[Push to GHCR]
-  E --> F[Deploy to Railway]
-  B --> G[npm build]
-  G --> H[Deploy to Vercel]
-```

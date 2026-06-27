@@ -33,7 +33,6 @@ This repository is designed following a **Python-first paradigm**:
 
 ```text
 Multilingual-Absa/
-├── .github/workflows/      # CI/CD pipelines
 ├── api/                    # FastAPI backend and inference services
 ├── config/                 # DVC and Docker configuration files
 ├── dashboard/              # React frontend for inference & monitoring
