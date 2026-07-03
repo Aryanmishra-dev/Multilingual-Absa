@@ -10,7 +10,7 @@ A production-ready, highly optimized Aspect-Based Sentiment Analysis (ABSA) syst
 
 The system leverages state-of-the-art models like **XLM-RoBERTa** and **IndicBERT**, optimized using ONNX runtime, and includes a highly robust, zero-download, pure-Python rule-based fallback engine for instant inference.
 
-## ✨ Key Features
+## Key Features
 
 - **Multilingual Support**: First-class support for English, Hindi, and code-mixed Hinglish.
 - **Dual Inference Engine**:
@@ -18,37 +18,37 @@ The system leverages state-of-the-art models like **XLM-RoBERTa** and **IndicBER
   - **Rule-Based Fallback**: An instantaneous, pure-Python fallback leveraging a curated multi-lingual lexicon to handle aspect extraction and sentiment scoring without any heavy downloads.
 - **Modern Tech Stack**: 
   - **Backend**: Asynchronous, high-performance API built with FastAPI.
-  - **Frontend**: A sleek, responsive dashboard built with React and TailwindCSS. Features real-time predictions, batch analytics, and system monitoring.
+  - **Frontend**: A responsive dashboard built with React and TailwindCSS. Features real-time predictions, batch analytics, and system monitoring.
 - **MLOps Integrated**: Complete integration with DVC (Data Version Control) for pipeline reproducibility, MLflow for experiment tracking, and Evidently AI for data drift monitoring.
 - **Scalable Architecture**: Support for async tasks via Celery + Redis, robust data storage via PostgreSQL, and metric exporting using Prometheus.
 
-## 🐍 Python-First Architecture
+## Python-First Architecture
 
 This repository is designed following a **Python-first paradigm**:
 - **Python (67.5%)**: Handling all business logic, data processing, configuration, API routing, ML inference, and utility functions using FastAPI and Python data science libraries.
 - **JavaScript/TypeScript (32.5%)**: Strictly limited to the frontend `dashboard/` directory, used *only* for the React UI, component rendering, browser events, and client-side state. 
 - *Note: There is no backend or ML logic written in JavaScript.*
 
-## 🏗️ Repository Structure
+## Repository Structure
 
 ```text
 Multilingual-Absa/
-├── api/                    # FastAPI backend and inference services
-├── config/                 # DVC and Docker configuration files
+├── api/app/                # FastAPI backend and inference services
+├── config/                 # Docker and application configuration files
 ├── dashboard/              # React frontend for inference & monitoring
 ├── data/                   # Dataset directory (DVC-tracked)
-├── docs/                   # Extended documentation
-├── mlflow/                 # MLflow tracking
+├── docs/                   # Extended documentation (architecture, ml, api)
+├── ml/                     # ML training, notebooks, MLflow, and tracking
 ├── models/                 # Model artifacts (DVC-tracked)
 ├── monitoring/             # Monitoring configurations (Prometheus, Evidently)
-├── notebooks/              # Exploratory Data Analysis & Prototyping
 ├── scripts/                # Utility and automation scripts
-├── src/                    # Machine Learning pipeline source code
+├── src/                    # Core Machine Learning pipeline source code
 ├── tests/                  # Unit and integration test suite
+├── dvc.yaml                # DVC pipeline orchestration
 └── requirements.txt        # Python dependencies
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Python 3.10+
@@ -78,7 +78,7 @@ cp .env.example .env
 
 The easiest way to get the entire stack (API, Dashboard, Redis, Postgres) running is via Docker Compose:
 ```bash
-docker-compose -f config/docker/docker-compose.yml up --build
+docker-compose -f deployment/docker/docker-compose.yml up --build
 ```
 
 ### 3. Manual ML Pipeline Execution (DVC)
@@ -94,8 +94,7 @@ dvc push         # Push newly generated artifacts to remote
 
 **Start the API Server:**
 ```bash
-cd api
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+PYTHONPATH=. uvicorn api.app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 *API Documentation will be available at `http://localhost:8000/docs`.*
 
@@ -107,13 +106,13 @@ npm run dev
 ```
 *Access the dashboard at `http://localhost:5173`.*
 
-## 🔬 How it Works
+## How it Works
 
 1. **Prediction API**: When a review is submitted, the language is auto-detected.
 2. **Inference**: The `ABSAPipeline` attempts to load INT8 quantized ONNX models for extraction and sentiment scoring. 
 3. **Fallback Mechanism**: If the custom models are not downloaded, the engine automatically falls back to a dictionary/rule-based engine tailored for product reviews, guaranteeing zero downtime and instant availability.
 4. **Monitoring**: All predictions are logged. Performance metrics and data drift are tracked via Evidently and Prometheus.
 
-## 🛡️ License
+## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.

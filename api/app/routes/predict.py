@@ -6,11 +6,11 @@ import uuid
 import tempfile
 import time
 
-from api.models.schemas import ReviewInput, PredictionResponse, BatchJobResponse
-from api.models.db_models import Review, AspectResult, BatchJob
-from api.middleware.dependencies import get_db
-from api.services.absa_pipeline import pipeline
-from api.tasks.batch_tasks import process_batch
+from api.app.schemas.schemas import ReviewInput, PredictionResponse, BatchJobResponse
+from api.app.schemas.db_models import Review, AspectResult, BatchJob
+from api.app.middleware.dependencies import get_db
+from api.app.services.absa_pipeline import pipeline
+from api.app.tasks.batch_tasks import process_batch
 
 router = APIRouter()
 

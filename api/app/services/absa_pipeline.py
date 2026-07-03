@@ -18,8 +18,8 @@ from pathlib import Path
 from typing import List, Tuple
 import numpy as np
 
-from api.models.schemas import PredictionResponse, AspectSentiment
-from api.services.lang_service import lang_service
+from api.app.schemas.schemas import PredictionResponse, AspectSentiment
+from api.app.services.lang_service import lang_service
 
 # ── Optional heavy imports (ONNX custom models) ───────────────────────────────
 try:

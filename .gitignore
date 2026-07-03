@@ -1,53 +1,65 @@
-# Credentials & Secrets
+# Security — CRITICAL
 .env
-.env.*
-!.env.example
-config/railway.json
-*.pem
-*.key
-*.p12
-*.pfx
-*.crt
-credentials.json
-secrets.json
-config.json
-*secret*
-*credential*
-*token*
-*apikey*
+.env.local
+.env.*.local
+*.db
+*.sqlite3
 
-# ML/Data artifacts
-/data/
-/models/
-*.pkl
-*.h5
-*.pt
-*.pth
-*.onnx
-*.bin
-mlruns/
-mlflow/
-
-# Runtime & Cache
-.venv/
-venv/
+# Python cache
 __pycache__/
 *.pyc
 *.pyo
+*.egg-info/
 .pytest_cache/
 .mypy_cache/
-*.log
-logs/
-test.db
-*.sqlite
-*.db
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# ML artifacts (large — tracked via DVC)
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.ckpt
+*.h5
+*.pkl
+*.joblib
+*.onnx
+
+# MLflow tracking (can be large)
+mlruns/
+
+# Data files (tracked via DVC)
+data/raw/
+data/processed/
+*.csv
+*.parquet
+*.jsonl
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Agent/IDE configs (optional — decide per tool)
+# .claude/
+# .opencode/
+
+# OS
 .DS_Store
 Thumbs.db
 
-# Docker & Infra
-docker-compose.override.yml
-*-secrets.yml
-*-credentials.yml
+# IDE
+.vscode/
+.idea/
 
-# Miscellaneous
+# Logs
+*.log
+logs/
+
+# Node
 node_modules/

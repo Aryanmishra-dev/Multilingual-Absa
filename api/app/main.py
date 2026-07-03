@@ -5,11 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
-from api.routes import predict, results  # noqa: E402
-from api.middleware.metrics import instrumentator  # noqa: E402
-from api.services.absa_pipeline import pipeline  # noqa: E402
-from api.models.db_models import Base  # noqa: E402
-from api.middleware.dependencies import engine  # noqa: E402
+from api.app.routes import predict, results  # noqa: E402
+from api.app.middleware.metrics import instrumentator  # noqa: E402
+from api.app.services.absa_pipeline import pipeline  # noqa: E402
+from api.app.schemas.db_models import Base  # noqa: E402
+from api.app.middleware.dependencies import engine  # noqa: E402
 
 
 @asynccontextmanager
