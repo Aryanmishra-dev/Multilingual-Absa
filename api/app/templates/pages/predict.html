@@ -32,44 +32,53 @@
 
     {# ── Left: Input panel ───────────────────────────────────────────────── #}
     <div class="lg:col-span-7 flex flex-col">
-      <div class="card-low flex flex-col h-full min-h-[420px]">
+      <form class="card-low flex flex-col h-full min-h-[420px] group"
+            hx-post="/predict/fragment"
+            hx-target="#result-panel"
+            x-data="{ text: '' }">
 
         <div class="flex justify-between items-center mb-lg pb-md border-b border-white/[0.06]">
           <h3 class="font-mono text-label-md text-[#c7c4d7] uppercase tracking-wider">
             Analyze Input
           </h3>
-          {# Language selector placeholder — wired up in Phase 3 #}
           <div class="flex items-center gap-2">
-            <label for="lang-select-preview"
-                   class="font-mono text-label-sm text-[#c7c4d7]">Language</label>
-            <select id="lang-select-preview" class="input-base py-1 text-body-sm" style="width:auto;" disabled>
-              <option>Auto-detect</option>
+            <label for="lang-select" class="font-mono text-label-sm text-[#c7c4d7]">Language</label>
+            <select id="lang-select" name="language" class="input-base py-1 text-body-sm" style="width:auto;">
+              <option value="auto">Auto-detect</option>
+              <option value="en">English</option>
+              <option value="hi">Hindi</option>
             </select>
           </div>
         </div>
 
-        {# Textarea placeholder #}
         <div class="flex-1 flex flex-col mb-lg">
-          <label for="review-text-preview"
-                 class="font-mono text-label-sm text-[#c7c4d7] mb-2">Source Text</label>
-          <textarea id="review-text-preview"
+          <label for="review-text" class="font-mono text-label-sm text-[#c7c4d7] mb-2">Source Text</label>
+          <textarea id="review-text"
+                    name="text"
+                    x-model="text"
+                    required
                     class="input-base flex-1 min-h-[260px] resize-none leading-relaxed"
                     placeholder="Paste your review, article, or social media post here…"
-                    disabled>
+                    @keydown.meta.enter="$el.form.dispatchEvent(new Event('submit', {cancelable: true, bubbles: true}))">
           </textarea>
           <div class="flex justify-between mt-2">
             <span class="font-mono text-label-sm text-[#c7c4d7]/50">⌘ Enter to analyze</span>
-            <span class="font-mono text-label-sm text-[#c7c4d7]/50">0 / 512</span>
+            <span class="font-mono text-label-sm text-[#c7c4d7]/50" x-text="text.length + ' / 512'">0 / 512</span>
           </div>
         </div>
 
-        {# Analyze button placeholder #}
-        <button class="btn-primary" disabled>
-          {{ ms_icon('bolt', size=16) }}
-          Analyze
+        <button type="submit" class="btn-primary" :disabled="text.length === 0">
+          <div class="flex items-center gap-2 group-[.htmx-request]:hidden">
+            {{ ms_icon('bolt', size=16) }}
+            <span>Analyze</span>
+          </div>
+          <div class="htmx-indicator items-center gap-2">
+            <span class="material-symbols-outlined animate-spin" style="font-size:16px;">autorenew</span>
+            <span>Analyzing...</span>
+          </div>
         </button>
 
-      </div>
+      </form>
     </div>
 
     {# ── Right: Results panel ─────────────────────────────────────────────── #}
@@ -92,23 +101,7 @@
 
   </div>{# /grid #}
 
-  {# Phase 2 notice (removed in Phase 3) #}
-  <div class="card border-[#c0c1ff]/20 bg-[#c0c1ff]/5">
-    <div class="flex items-start gap-3">
-      {{ ms_icon('info', size=18, cls='text-[#c0c1ff] mt-0.5 flex-shrink-0') }}
-      <div>
-        <p class="text-body-md text-[#dae2fd] font-medium mb-1">Phase 2 Infrastructure</p>
-        <p class="text-body-sm text-[#c7c4d7]">
-          The layout shell is in place. The
-          <code class="font-mono text-[#c0c1ff] text-xs">POST /predict</code>
-          API endpoint is fully operational — HTMX interactions will be wired in Phase 3.
-          <a href="/docs#/Predict/predict_predict_post"
-             target="_blank"
-             class="text-[#c0c1ff] hover:underline ml-1">Test the API directly →</a>
-        </p>
-      </div>
-    </div>
-  </div>
+
 
 </div>
 {% endblock %}

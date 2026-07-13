@@ -109,3 +109,37 @@ async def monitor_page(request: Request) -> HTMLResponse:
         "pages/monitor.html",
         _base_ctx(request, "System Monitor"),
     )
+
+# ── Phase 3 HTMX Endpoints ───────────────────────────────────────────────────
+
+from fastapi import Depends, Form
+from sqlalchemy.orm import Session
+from api.app.middleware.dependencies import get_db
+from api.app.schemas.schemas import ReviewInput
+from api.app.routes.predict import predict as predict_json
+
+@router.post("/predict/fragment", response_class=HTMLResponse)
+async def predict_fragment(
+    request: Request,
+    text: str = Form(...),
+    language: str = Form("auto"),
+    db: Session = Depends(get_db)
+) -> HTMLResponse:
+    """
+    Phase 3: HTMX partial for the Predict page.
+    Calls the EXACT SAME prediction logic as the JSON API.
+    """
+    try:
+        if language == "auto":
+            language = None
+            
+        prediction = await predict_json(ReviewInput(text=text, language=language), db)
+        return templates.TemplateResponse(
+            "partials/predict_result.html",
+            {"request": request, "result": prediction, "error": None}
+        )
+    except Exception as e:
+        return templates.TemplateResponse(
+            "partials/predict_result.html",
+            {"request": request, "result": None, "error": str(e)}
+        )

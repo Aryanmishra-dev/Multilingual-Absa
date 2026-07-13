@@ -143,7 +143,37 @@ class TestExistingAPIUnchanged:
     Re-run the core API assertions to prove Phase 2 changes introduced
     zero regressions.  These mirror tests/api/test_api.py in spirit.
     """
+class TestPredictFragment:
+    """Verify the new HTMX predict endpoint works exactly like the JSON one."""
 
+    def test_predict_fragment_english(self):
+        with _html_client() as client:
+            response = client.post(
+                "/predict/fragment",
+                data={"text": "The food was great but service was slow.", "language": "en"},
+            )
+        assert response.status_code == 200
+        assert "text/html" in response.headers["content-type"]
+        assert "Detected Aspects" in response.text
+        # the response might say "No aspects detected" or show the list, but both are valid HTML
+        assert "food" in response.text # text should be in the annotated container
+
+    def test_predict_fragment_auto(self):
+        with _html_client() as client:
+            response = client.post(
+                "/predict/fragment",
+                data={"text": "The food was great but service was slow.", "language": "auto"},
+            )
+        assert response.status_code == 200
+        assert "text/html" in response.headers["content-type"]
+        assert "EN" in response.text or "English" in response.text or "en" in response.text
+
+    def test_predict_fragment_empty_text(self):
+        with _html_client() as client:
+            # Form submission missing 'text' should trigger FastAPI 422
+            response = client.post("/predict/fragment", data={"language": "en"})
+        # Note: Depending on FastAPI validation, missing Form field might be 422
+        assert response.status_code == 422
     def test_health_endpoint_still_returns_json(self):
         with _html_client() as client:
             response = client.get("/health")
