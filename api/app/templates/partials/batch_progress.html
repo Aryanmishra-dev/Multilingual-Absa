@@ -1,0 +1,44 @@
+{% from "macros/ui.html" import ms_icon %}
+
+<div class="card-low animate-fade-in p-6" id="batch-progress-container">
+    {% if error %}
+    <div class="flex flex-col items-center justify-center gap-4 py-8 text-[#ffb4ab]">
+        {{ ms_icon('error', size=48, cls='opacity-80') }}
+        <p class="text-sm font-medium">{{ error }}</p>
+    </div>
+    {% else %}
+    <div class="flex items-center justify-between mb-4">
+        <div>
+            <h4 class="text-body-lg text-[#dae2fd] font-medium">Batch Job: <span class="font-mono text-sm">{{ job.job_id }}</span></h4>
+            <p class="text-body-sm text-[#c7c4d7]/70 mt-1">Status: <span class="capitalize">{{ job.status }}</span></p>
+        </div>
+        {% if job.status == 'completed' %}
+            <a href="/results/download/{{ job.job_id }}" class="btn-primary" download>
+                {{ ms_icon('download', size=18) }}
+                Download Results
+            </a>
+        {% elif job.status == 'failed' %}
+            <span class="text-[#ffb4ab] font-medium flex items-center gap-1">{{ ms_icon('error', size=16) }} Failed</span>
+        {% else %}
+            <div class="flex items-center gap-2 text-[#c0c1ff]">
+                <span class="material-symbols-outlined animate-spin" style="font-size:16px;">autorenew</span>
+                <span class="text-sm font-medium">Processing...</span>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="w-full bg-[#1b2234] rounded-full h-3 mb-2 overflow-hidden border border-white/[0.04]">
+        {% set percent = (job.processed / job.total_reviews * 100) if job.total_reviews > 0 else 0 %}
+        <div class="bg-[#c0c1ff] h-3 rounded-full transition-all duration-500 ease-out" style="width: {{ percent }}%"></div>
+    </div>
+    
+    <div class="flex justify-between text-label-sm font-mono text-[#c7c4d7]/70">
+        <span>{{ job.processed }} processed</span>
+        <span>{{ job.total_reviews }} total</span>
+    </div>
+
+    {% if job.status in ['queued', 'processing'] %}
+    <div hx-get="/batch/progress/{{ job.job_id }}" hx-trigger="every 2s" hx-swap="outerHTML" hx-target="#batch-progress-container"></div>
+    {% endif %}
+    {% endif %}
+</div>

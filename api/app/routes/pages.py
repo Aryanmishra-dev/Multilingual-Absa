@@ -143,3 +143,50 @@ async def predict_fragment(
             "partials/predict_result.html",
             {"request": request, "result": None, "error": str(e)}
         )
+
+# ── Phase 4 HTMX Endpoints ───────────────────────────────────────────────────
+
+from fastapi import UploadFile, File
+from api.app.routes.predict import predict_batch, get_batch_status
+
+@router.post("/batch/fragment", response_class=HTMLResponse)
+async def batch_fragment(
+    request: Request,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db)
+) -> HTMLResponse:
+    """
+    Phase 4: HTMX partial for starting a batch job.
+    """
+    try:
+        response = await predict_batch(file, db)
+        return templates.TemplateResponse(
+            "partials/batch_progress.html",
+            {"request": request, "job": response, "error": None}
+        )
+    except Exception as e:
+        return templates.TemplateResponse(
+            "partials/batch_progress.html",
+            {"request": request, "job": None, "error": str(e)}
+        )
+
+@router.get("/batch/progress/{job_id}", response_class=HTMLResponse)
+async def batch_progress_fragment(
+    request: Request,
+    job_id: str,
+    db: Session = Depends(get_db)
+) -> HTMLResponse:
+    """
+    Phase 4: HTMX partial for polling batch job status.
+    """
+    try:
+        job = await get_batch_status(job_id, db)
+        return templates.TemplateResponse(
+            "partials/batch_progress.html",
+            {"request": request, "job": job, "error": None}
+        )
+    except Exception as e:
+        return templates.TemplateResponse(
+            "partials/batch_progress.html",
+            {"request": request, "job": None, "error": str(e)}
+        )

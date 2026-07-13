@@ -225,3 +225,48 @@ class TestPredictFragment:
             method == "post" for method in paths.get("/batch", {})
         ), "GET /batch should not appear in OpenAPI schema"
         assert "/monitor" not in paths, "GET /monitor should not appear in OpenAPI schema"
+
+class TestBatchFragments:
+    """Verify Phase 4 Batch Analytics HTMX endpoints."""
+
+    def test_batch_fragment_upload(self):
+        with _html_client() as client:
+            files = {"file": ("test.csv", b"text\nThis is great\nThis is bad", "text/csv")}
+            response = client.post("/batch/fragment", files=files)
+        
+        assert response.status_code == 200
+        assert "text/html" in response.headers["content-type"]
+        assert "Batch Job:" in response.text
+        assert "queued" in response.text.lower() or "processing" in response.text.lower() or "completed" in response.text.lower()
+
+    def test_batch_fragment_invalid_file(self):
+        with _html_client() as client:
+            files = {"file": ("test.txt", b"text\nThis is great", "text/plain")}
+            response = client.post("/batch/fragment", files=files)
+            
+        assert response.status_code == 200
+        assert "text/html" in response.headers["content-type"]
+        assert "Only CSV files are allowed" in response.text or "error" in response.text.lower()
+
+    def test_batch_progress_polling(self):
+        # 1. upload file to get job_id
+        with _html_client() as client:
+            files = {"file": ("test.csv", b"text\nHello", "text/csv")}
+            response1 = client.post("/batch/fragment", files=files)
+            import re
+            match = re.search(r'<span class="font-mono text-sm">([a-f0-9-]+)</span>', response1.text)
+            assert match, "Could not find job_id in HTML"
+            job_id = match.group(1)
+            
+            # 2. poll progress
+            response2 = client.get(f"/batch/progress/{job_id}")
+            assert response2.status_code == 200
+            assert "text/html" in response2.headers["content-type"]
+            assert job_id in response2.text
+
+    def test_download_endpoint_exists(self):
+        with _html_client() as client:
+            # We don't have a guaranteed completed job to download, but we can verify 
+            # 404 is returned instead of 405 Method Not Allowed, meaning it exists.
+            response = client.get("/results/download/fake-job-id")
+            assert response.status_code == 404

@@ -28,34 +28,57 @@
     </p>
   </div>
 
-  {# ── Upload zone placeholder ──────────────────────────────────────────────── #}
-  <section class="card" aria-label="File upload">
-    <div class="border-2 border-dashed border-white/[0.14] rounded-xl p-12
-                flex flex-col items-center justify-center text-center">
-      {{ ms_icon('cloud_upload', size=48, cls='text-[#c7c4d7] mb-4') }}
-      <h2 class="text-headline-sm text-[#dae2fd] mb-2">
-        Drag &amp; drop a CSV, or click to select
-      </h2>
-      <p class="text-body-md text-[#c7c4d7] max-w-sm">
-        Must contain a <code class="font-mono text-[#c0c1ff] px-1">text</code> column.
-        Maximum 10,000 rows. Files are deleted after analysis.
-      </p>
-    </div>
-
-    {# Phase 2 notice #}
-    <div class="mt-lg flex items-start gap-3 p-md rounded-lg bg-[#c0c1ff]/5 border border-[#c0c1ff]/20">
-      {{ ms_icon('info', size=18, cls='text-[#c0c1ff] mt-0.5 flex-shrink-0') }}
-      <div>
-        <p class="text-body-sm text-[#c7c4d7]">
-          File upload and batch processing are fully operational via
-          <code class="font-mono text-[#c0c1ff] text-xs">POST /batch</code>.
-          HTMX drag-and-drop UI and progress polling will be added in Phase 4.
-          <a href="/docs#/Predict/predict_batch_batch_post"
-             target="_blank"
-             class="text-[#c0c1ff] hover:underline ml-1">Test the API →</a>
+  {# ── Upload zone ──────────────────────────────────────────────────────────── #}
+  <section aria-label="File upload">
+    <form hx-encoding="multipart/form-data" 
+          hx-post="/batch/fragment" 
+          hx-target="#batch-progress" 
+          class="card group" 
+          x-data="{ file: null, drag: false }">
+          
+      <div x-on:dragover.prevent="drag = true" 
+           x-on:dragleave.prevent="drag = false"
+           x-on:drop.prevent="drag = false; $refs.fileInput.files = $event.dataTransfer.files; file = $refs.fileInput.files[0]"
+           :class="drag ? 'border-[#c0c1ff]/60 bg-[#c0c1ff]/5' : 'border-white/[0.14] hover:border-[#c0c1ff]/40 hover:bg-[#c0c1ff]/[0.02]'"
+           class="border-2 border-dashed rounded-xl p-12 flex flex-col items-center justify-center text-center cursor-pointer transition-colors duration-200"
+           @click="$refs.fileInput.click()">
+        <input type="file" name="file" x-ref="fileInput" class="hidden" accept=".csv" @change="file = $event.target.files[0]">
+        {{ ms_icon('cloud_upload', size=48, cls='text-[#c7c4d7] mb-4') }}
+        <h2 class="text-headline-sm text-[#dae2fd] mb-2" x-text="drag ? 'Drop the CSV here…' : 'Drag &amp; drop a CSV, or click to select'"></h2>
+        <p class="text-body-md text-[#c7c4d7] max-w-sm">
+          Must contain a <code class="font-mono text-[#c0c1ff] px-1">text</code> column.
+          Maximum 10,000 rows. Files are deleted after analysis.
         </p>
       </div>
-    </div>
+
+      <!-- Selected file row -->
+      <template x-if="file">
+        <div class="mt-lg flex items-center justify-between p-md rounded-lg bg-[#222a3d] border border-white/[0.08] animate-slide-in">
+          <div class="flex items-center gap-3">
+            {{ ms_icon('description', size=20, cls='text-[#c0c1ff]') }}
+            <div>
+              <p class="text-body-md text-[#dae2fd] font-medium" x-text="file.name"></p>
+              <p class="font-mono text-label-sm text-[#c7c4d7]" x-text="(file.size / 1024 / 1024).toFixed(2) + ' MB'"></p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button type="button" @click.stop="file = null; $refs.fileInput.value = ''" class="px-3 py-1.5 text-body-sm text-[#c7c4d7] border border-white/[0.12] rounded-lg hover:bg-white/[0.05] hover:text-[#dae2fd] transition-colors">
+              Remove
+            </button>
+            <button type="submit" class="btn-primary text-body-sm relative group-[.htmx-request]:pointer-events-none">
+              <div class="flex items-center gap-2 group-[.htmx-request]:hidden">
+                {{ ms_icon('rocket_launch', size=16) }} Process File
+              </div>
+              <div class="htmx-indicator items-center gap-2">
+                <span class="material-symbols-outlined animate-spin" style="font-size:16px;">progress_activity</span> Processing
+              </div>
+            </button>
+          </div>
+        </div>
+      </template>
+    </form>
+    
+    <div id="batch-progress" class="mt-lg"></div>
   </section>
 
   {# ── Recent batches table placeholder ─────────────────────────────────────── #}
@@ -95,9 +118,6 @@
         </table>
       </div>
     </div>
-    <p class="mt-2 font-mono text-label-sm text-[#c7c4d7]/50 text-center">
-      Phase 4 will populate this table from the database.
-    </p>
   </section>
 
 </div>
