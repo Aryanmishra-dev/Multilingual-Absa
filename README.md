@@ -25,9 +25,9 @@ The system leverages state-of-the-art models like **XLM-RoBERTa** and **IndicBER
 ## Python-First Architecture
 
 This repository is designed following a **Python-first paradigm**:
-- **Python (67.5%)**: Handling all business logic, data processing, configuration, API routing, ML inference, and utility functions using FastAPI and Python data science libraries.
-- **JavaScript/TypeScript (32.5%)**: Strictly limited to the frontend `dashboard/` directory, used *only* for the Alpine.js for minimal client-side state. 
-- *Note: There is no backend or ML logic written in JavaScript.*
+- **Python (99%)**: Handling all business logic, data processing, configuration, API routing, ML inference, SSR (Server-Side Rendering) via Jinja2, and utility functions.
+- **JavaScript (1%)**: Strictly limited to Alpine.js for minimal client-side interactivity and Chart.js for visualization (loaded via CDN).
+- *Note: There is no decoupled SPA frontend (like React) or Node.js runtime required.*
 
 ## Repository Structure
 
@@ -92,16 +92,12 @@ dvc push         # Push newly generated artifacts to remote
 
 ### 4. Running the Application Locally
 
-**Start the API Server:**
+**Start the Application Server (API & Dashboard):**
 ```bash
 PYTHONPATH=. uvicorn api.app.main:app --reload --host 0.0.0.0 --port 8000
 ```
-*API Documentation will be available at `http://localhost:8000/docs`.*
-
-**Start the Dashboard:**
-```bash
-```
-*Access the dashboard at `http://localhost:8000/predict`.*
+- Access the dashboard at: `http://localhost:8000/predict`
+- API Documentation available at: `http://localhost:8000/docs`
 
 ## How it Works
 
