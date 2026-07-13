@@ -2,7 +2,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.111.0-00a393.svg)
-![React](https://img.shields.io/badge/React-18-61dafb.svg)
+![React](https://img.shields.io/badge/HTMX-1.9-3d72d4.svg)
 ![DVC](https://img.shields.io/badge/DVC-3.51.1-945dd6.svg)
 ![MLflow](https://img.shields.io/badge/MLflow-2.13.0-0194E2.svg)
 
@@ -18,7 +18,7 @@ The system leverages state-of-the-art models like **XLM-RoBERTa** and **IndicBER
   - **Rule-Based Fallback**: An instantaneous, pure-Python fallback leveraging a curated multi-lingual lexicon to handle aspect extraction and sentiment scoring without any heavy downloads.
 - **Modern Tech Stack**: 
   - **Backend**: Asynchronous, high-performance API built with FastAPI.
-  - **Frontend**: A responsive dashboard built with React and TailwindCSS. Features real-time predictions, batch analytics, and system monitoring.
+  - **Frontend**: A responsive dashboard built with FastAPI, Jinja2, HTMX, and TailwindCSS. Features real-time predictions, batch analytics, and system monitoring.
 - **MLOps Integrated**: Complete integration with DVC (Data Version Control) for pipeline reproducibility, MLflow for experiment tracking, and Evidently AI for data drift monitoring.
 - **Scalable Architecture**: Support for async tasks via Celery + Redis, robust data storage via PostgreSQL, and metric exporting using Prometheus.
 
@@ -26,7 +26,7 @@ The system leverages state-of-the-art models like **XLM-RoBERTa** and **IndicBER
 
 This repository is designed following a **Python-first paradigm**:
 - **Python (67.5%)**: Handling all business logic, data processing, configuration, API routing, ML inference, and utility functions using FastAPI and Python data science libraries.
-- **JavaScript/TypeScript (32.5%)**: Strictly limited to the frontend `dashboard/` directory, used *only* for the React UI, component rendering, browser events, and client-side state. 
+- **JavaScript/TypeScript (32.5%)**: Strictly limited to the frontend `dashboard/` directory, used *only* for the Alpine.js for minimal client-side state. 
 - *Note: There is no backend or ML logic written in JavaScript.*
 
 ## Repository Structure
@@ -35,7 +35,7 @@ This repository is designed following a **Python-first paradigm**:
 Multilingual-Absa/
 ├── api/app/                # FastAPI backend and inference services
 ├── config/                 # Docker and application configuration files
-├── dashboard/              # React frontend for inference & monitoring
+├── api/app/templates/      # Jinja2 HTMX frontend templates
 ├── data/                   # Dataset directory (DVC-tracked)
 ├── docs/                   # Extended documentation (architecture, ml, api)
 ├── ml/                     # ML training, notebooks, MLflow, and tracking
@@ -52,7 +52,7 @@ Multilingual-Absa/
 
 ### Prerequisites
 - Python 3.10+
-- Node.js (for Dashboard)
+
 - Docker & Docker Compose (Optional, but recommended)
 
 ### 1. Local Setup
@@ -100,11 +100,8 @@ PYTHONPATH=. uvicorn api.app.main:app --reload --host 0.0.0.0 --port 8000
 
 **Start the Dashboard:**
 ```bash
-cd dashboard
-npm install
-npm run dev
 ```
-*Access the dashboard at `http://localhost:5173`.*
+*Access the dashboard at `http://localhost:8000/predict`.*
 
 ## How it Works
 

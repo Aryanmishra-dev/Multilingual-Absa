@@ -3,10 +3,10 @@
 ## Prerequisites
 
 - Python 3.11+
-- Node.js 20+
+- 
 - Docker & Docker Compose (for containerized deployment)
 - Railway account (for API deployment)
-- Vercel account (for dashboard deployment)
+- 
 
 ## Environment Variables
 
@@ -36,11 +36,6 @@ uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
 # MLflow UI at http://localhost:5000
 
 # Frontend
-cd dashboard
-cp .env.example .env     # VITE_API_URL=http://localhost:8000
-npm install
-npm run dev
-# Dashboard at http://localhost:5173
 ```
 
 ## Docker Compose (Full Stack)
@@ -90,7 +85,6 @@ graph TB
 
 ### Vercel (Dashboard)
 
-1. Import `dashboard/` as a Vercel project
 2. Framework preset: Vite
 3. Environment variable: `VITE_API_URL=https://your-railway-api-url.railway.app`
 4. `vercel.json` rewrites `/api/*` to Railway API

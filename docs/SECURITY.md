@@ -9,7 +9,7 @@
 | HTTPS | ❌ Not enforced | Expects reverse proxy to terminate TLS |
 | Input Validation | ✅ Partial | Pydantic validation present; no server-side max_length |
 | SQL Injection | ✅ Protected | SQLAlchemy ORM parameterized queries |
-| XSS | ✅ Protected | React JSX auto-escaping |
+| XSS | ✅ Protected | Jinja2 auto-escaping |
 | CSRF | ❌ Not implemented | No CSRF middleware; CORS `"*"` mitigates partially |
 | Secrets Management | ⚠️ Manual | `.env` gitignored; Docker Compose has hardcoded dev creds |
 | Rate Limiting | ❌ Not implemented | No throttling on any endpoint |

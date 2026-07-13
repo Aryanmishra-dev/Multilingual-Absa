@@ -43,10 +43,10 @@ graph TB
 ```mermaid
 graph LR
     subgraph "Presentation Layer"
-        SPA[React SPA]
+        SPA[HTMX Frontend]
         T_TAIL[TailwindCSS Theme]
         RECH[Recharts Visualizations]
-        RQ[React Query]
+        RQ[HTMX Polling]
     end
     subgraph "API Layer"
         FAST[FastAPI]
@@ -111,7 +111,7 @@ graph TB
         RW_REDIS[Redis]
     end
     subgraph "Vercel (Production)"
-        VC_DASH[React SPA]
+        VC_DASH[HTMX Frontend]
         VC_RW_ROUTE[rewrite /api/* -> Railway]
     end
 
