@@ -1,0 +1,19 @@
+{% from "macros/ui.html" import health_chip %}
+
+<div id="health-status"
+     hx-get="/monitor/health-partial"
+     hx-trigger="every 30s"
+     hx-swap="outerHTML"
+     class="flex items-center gap-3 pt-lg border-t border-white/[0.06]">
+  <span class="text-body-md text-[#c7c4d7]">Current state:</span>
+  
+  {% if error %}
+    <span class="badge-error">
+      <span class="w-2 h-2 rounded-full bg-[#ffb4ab] animate-pulse flex-shrink-0"></span>
+      Service Unavailable
+    </span>
+  {% else %}
+    {{ health_chip(health.status == 'ok') }}
+  {% endif %}
+  <span class="htmx-indicator ml-2 text-[#c7c4d7]/70 font-mono text-label-sm">Updating...</span>
+</div>

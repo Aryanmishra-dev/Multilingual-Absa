@@ -98,18 +98,21 @@ async def batch_page(request: Request) -> HTMLResponse:
     )
 
 
+from api.app.routes.results import health_check
+
 @router.get("/monitor", response_class=HTMLResponse)
 async def monitor_page(request: Request) -> HTMLResponse:
     """
     Jinja2 System Monitor page.
-    Phase 2: placeholder.
     Phase 5: live health status + performance metrics.
     """
-    return templates.TemplateResponse(
-        "pages/monitor.html",
-        _base_ctx(request, "System Monitor"),
-    )
-
+    try:
+        health = await health_check()
+        ctx = _base_ctx(request, "System Monitor", health=health, error=None)
+    except Exception as e:
+        ctx = _base_ctx(request, "System Monitor", health=None, error=str(e))
+        
+    return templates.TemplateResponse("pages/monitor.html", ctx)
 # ── Phase 3 HTMX Endpoints ───────────────────────────────────────────────────
 
 from fastapi import Depends, Form
@@ -189,4 +192,24 @@ async def batch_progress_fragment(
         return templates.TemplateResponse(
             "partials/batch_progress.html",
             {"request": request, "job": None, "error": str(e)}
+        )
+
+# ── Phase 5 HTMX Endpoints ───────────────────────────────────────────────────
+
+@router.get("/monitor/health-partial", response_class=HTMLResponse)
+async def monitor_health_fragment(request: Request) -> HTMLResponse:
+    """
+    Phase 5: HTMX partial for polling the system health status.
+    Uses the exact same health logic as the JSON API.
+    """
+    try:
+        health = await health_check()
+        return templates.TemplateResponse(
+            "partials/monitor_health.html",
+            {"request": request, "health": health, "error": None}
+        )
+    except Exception as e:
+        return templates.TemplateResponse(
+            "partials/monitor_health.html",
+            {"request": request, "health": None, "error": str(e)}
         )
