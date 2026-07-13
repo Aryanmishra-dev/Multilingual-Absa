@@ -1,0 +1,497 @@
+/*
+ * SentimentAI — Application Design System
+ *
+ * WHY THIS FILE EXISTS
+ * --------------------
+ * The React dashboard used Tailwind's @apply directive to define component
+ * classes (badge-positive, card, btn-primary, etc.) inside index.css.  Those
+ * @apply rules require a compiled Tailwind build step which we are eliminating.
+ *
+ * This file replaces index.css + the @apply rules with equivalent plain CSS.
+ * Tailwind utility classes (bg-*, text-*, flex, etc.) are still available via
+ * the CDN Play CDN loaded in base.html — this file only contains component-level
+ * classes that the CDN cannot generate from the HTML scan.
+ *
+ * Design token values are taken verbatim from dashboard/tailwind.config.js.
+ * Do not change token values here without updating the Tailwind CDN config in
+ * base.html — they must stay in sync.
+ *
+ * SECTIONS
+ * --------
+ *   1. Base / Reset
+ *   2. Material Symbols Outlined icon font
+ *   3. Scrollbar
+ *   4. Focus ring
+ *   5. Layout helpers  (glass-panel, sidebar, overlay)
+ *   6. Navigation       (nav-item, nav-item-active)
+ *   7. Badges           (badge-positive, -negative, -neutral, -processing, -error)
+ *   8. Highlights       (highlight-positive, -negative, -neutral)
+ *   9. Cards            (card, card-low, stat-card)
+ *  10. Form controls    (input-base, textarea reset)
+ *  11. Button           (btn-primary)
+ *  12. Drag-and-drop    (drag-active)
+ *  13. HTMX             (htmx-indicator)
+ *  14. Animations       (keyframes + helper classes)
+ *  15. Toast notices
+ */
+
+/* ── 1. Base / Reset ────────────────────────────────────────────────────────── */
+
+html {
+  color-scheme: dark;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: #0b1326;
+  color: #dae2fd;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ── 2. Material Symbols Outlined ───────────────────────────────────────────── */
+/*
+ * Mirrors the class defined in React's index.css exactly.
+ * The font itself is loaded via Google Fonts CDN in base.html.
+ */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  vertical-align: middle;
+}
+
+/* ── 3. Scrollbar ────────────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar          { width: 6px; height: 6px; }
+::-webkit-scrollbar-track    { background: transparent; }
+::-webkit-scrollbar-thumb    { background: rgba(255, 255, 255, 0.12); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.22); }
+
+/* ── 4. Focus ring ──────────────────────────────────────────────────────────── */
+
+:focus-visible {
+  outline: 2px solid #c0c1ff;
+  outline-offset: 2px;
+}
+
+/* ── 5. Layout helpers ──────────────────────────────────────────────────────── */
+
+.glass-panel {
+  background-color: rgba(23, 31, 51, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Sidebar slide-in / slide-out on mobile */
+.sidebar {
+  transform: translateX(-100%);
+  transition: transform 250ms ease-out;
+}
+.sidebar.sidebar--open {
+  transform: translateX(0);
+}
+@media (min-width: 768px) {
+  .sidebar {
+    transform: translateX(0);
+  }
+}
+
+/* Mobile overlay (backdrop) */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 40;
+}
+.sidebar-overlay.sidebar-overlay--visible {
+  display: block;
+}
+
+/* ── 6. Navigation ──────────────────────────────────────────────────────────── */
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #c7c4d7;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+.nav-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #dae2fd;
+}
+
+.nav-item-active {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #c0c1ff;
+  background-color: rgba(255, 255, 255, 0.07);
+  border-right: 2px solid #c0c1ff;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ── 7. Badges ──────────────────────────────────────────────────────────────── */
+/*
+ * All badges share the same structural CSS.  The colour variant is applied
+ * via the class suffix.  Each badge is intentionally uppercase + monospace
+ * to match the React component styling.
+ */
+
+.badge-base {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.badge-positive {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background-color: rgba(78, 222, 163, 0.10);
+  color: #4edea3;
+  border: 1px solid rgba(78, 222, 163, 0.25);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.badge-negative {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background-color: rgba(255, 180, 171, 0.10);
+  color: #ffb4ab;
+  border: 1px solid rgba(255, 180, 171, 0.25);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.badge-neutral {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background-color: rgba(144, 143, 160, 0.10);
+  color: #c7c4d7;
+  border: 1px solid rgba(144, 143, 160, 0.25);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.badge-processing {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background-color: rgba(192, 193, 255, 0.10);
+  color: #c0c1ff;
+  border: 1px solid rgba(192, 193, 255, 0.25);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  animation: pulse-badge 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.badge-error {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background-color: rgba(255, 180, 171, 0.10);
+  color: #ffb4ab;
+  border: 1px solid rgba(255, 180, 171, 0.25);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Dot inside badge */
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+  display: inline-block;
+}
+.badge-dot--positive { background-color: #4edea3; }
+.badge-dot--negative { background-color: #ffb4ab; }
+.badge-dot--neutral  { background-color: #908fa0; }
+.badge-dot--primary  { background-color: #c0c1ff; }
+.badge-dot--error    { background-color: #ffb4ab; }
+
+/* ── 8. Highlights (annotated text) ─────────────────────────────────────────── */
+/*
+ * Applied by the server-side annotated-text builder (Phase 3) to wrap
+ * aspect spans inside the review text.
+ */
+
+.highlight-positive {
+  background-color: rgba(78, 222, 163, 0.15);
+  color: #4edea3;
+  border: 1px solid rgba(78, 222, 163, 0.30);
+  border-radius: 4px;
+  padding: 0 4px;
+  margin: 0 2px;
+  font-weight: 500;
+}
+
+.highlight-negative {
+  background-color: rgba(255, 180, 171, 0.15);
+  color: #ffb4ab;
+  border: 1px solid rgba(255, 180, 171, 0.30);
+  border-radius: 4px;
+  padding: 0 4px;
+  margin: 0 2px;
+  font-weight: 500;
+}
+
+.highlight-neutral {
+  background-color: rgba(144, 143, 160, 0.15);
+  color: #c7c4d7;
+  border: 1px solid rgba(144, 143, 160, 0.25);
+  border-radius: 4px;
+  padding: 0 4px;
+  margin: 0 2px;
+  font-weight: 500;
+}
+
+/* ── 9. Cards ────────────────────────────────────────────────────────────────── */
+
+.card {
+  background-color: #171f33;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 24px;
+}
+
+.card-low {
+  background-color: #131b2e;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 24px;
+}
+
+.stat-card {
+  background-color: #171f33;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── 10. Form controls ──────────────────────────────────────────────────────── */
+
+.input-base {
+  background-color: #0b1326;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  line-height: 20px;
+  color: #dae2fd;
+  width: 100%;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.input-base::placeholder {
+  color: rgba(199, 196, 215, 0.60);
+}
+
+.input-base:focus {
+  outline: none;
+  border-color: #c0c1ff;
+  box-shadow: 0 0 0 1px rgba(192, 193, 255, 0.40);
+}
+
+/* Select arrow */
+select.input-base {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c7c4d7' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 32px;
+  cursor: pointer;
+}
+
+/* Textarea */
+textarea.input-base {
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+/* ── 11. Button — primary ────────────────────────────────────────────────────── */
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #c0c1ff;
+  color: #1000a9;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: filter 150ms ease, transform 150ms ease;
+  white-space: nowrap;
+}
+.btn-primary:hover  { filter: brightness(1.10); }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:disabled,
+.btn-primary[disabled] {
+  opacity: 0.50;
+  cursor: not-allowed;
+  transform: none;
+  pointer-events: none;
+}
+
+/* ── 12. Drag-and-drop ──────────────────────────────────────────────────────── */
+
+.drag-active {
+  border-color: rgba(192, 193, 255, 0.70) !important;
+  background-color: rgba(192, 193, 255, 0.04) !important;
+}
+
+/* ── 13. HTMX indicators ────────────────────────────────────────────────────── */
+/*
+ * HTMX adds .htmx-request to the element that triggered the request.
+ * Elements with .htmx-indicator are hidden by default and shown during request.
+ */
+.htmx-indicator                        { display: none; }
+.htmx-request .htmx-indicator          { display: flex; }
+.htmx-request.htmx-indicator           { display: flex; }
+
+/* Progress bar fill animation */
+.progress-bar {
+  transition: width 500ms ease;
+}
+
+/* ── 14. Animations ──────────────────────────────────────────────────────────── */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0);   }
+}
+
+@keyframes pulse-badge {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.6; }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg);   }
+  to   { transform: rotate(360deg); }
+}
+
+.animate-fade-in   { animation: fadeIn 0.20s ease-out; }
+.animate-slide-in  { animation: slideIn 0.25s ease-out; }
+.animate-spin      { animation: spin 1s linear infinite; }
+.animate-pulse-slow { animation: pulse-dot 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+/* ── 15. Toast notifications ─────────────────────────────────────────────────── */
+/*
+ * Toasts are managed by Alpine.js appState().
+ * Base styles here; position and z-index are set with Tailwind utilities in base.html.
+ */
+.toast {
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background-color: #222a3d;
+  color: #dae2fd;
+  font-size: 14px;
+  max-width: 380px;
+  pointer-events: auto;
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+.toast--success { border-color: rgba(78, 222, 163, 0.30);  color: #4edea3; }
+.toast--error   { border-color: rgba(255, 180, 171, 0.30); color: #ffb4ab; }
+.toast--info    { border-color: rgba(192, 193, 255, 0.20); color: #dae2fd; }

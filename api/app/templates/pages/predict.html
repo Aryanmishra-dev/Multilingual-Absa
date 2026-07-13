@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% from "macros/ui.html" import ms_icon, empty_state %}
+
+{% block title %}Live Predictor{% endblock %}
+{% block description %}Analyze aspect-based sentiment in English and Hindi text in real time.{% endblock %}
+
+{% block content %}
+{#
+  Phase 2: Placeholder layout for the Predict page.
+
+  What this page will contain after Phase 3:
+    - Left panel  : textarea input + language selector + Analyze button
+    - Right panel : annotated result text + aspect cards (HTMX swap target)
+    - POST /predict/fragment → returns partials/predict_result.html
+
+  The outer grid, headings, and card shells are already correct here so Phase 3
+  only needs to fill in the form and wire up HTMX — no structural changes.
+#}
+<div class="space-y-xl">
+
+  {# ── Page header ─────────────────────────────────────────────────────────── #}
+  <div>
+    <h1 class="text-headline-md text-[#dae2fd]">Live Sentiment Predictor</h1>
+    <p class="mt-1 text-body-md text-[#c7c4d7] max-w-2xl">
+      Enter text to analyze its aspects and sentiments in real-time.
+      The model automatically identifies the language and extracts key phrases.
+    </p>
+  </div>
+
+  {# ── Two-column layout (mirrors LivePredictor.jsx structure) ─────────────── #}
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-xl">
+
+    {# ── Left: Input panel ───────────────────────────────────────────────── #}
+    <div class="lg:col-span-7 flex flex-col">
+      <div class="card-low flex flex-col h-full min-h-[420px]">
+
+        <div class="flex justify-between items-center mb-lg pb-md border-b border-white/[0.06]">
+          <h3 class="font-mono text-label-md text-[#c7c4d7] uppercase tracking-wider">
+            Analyze Input
+          </h3>
+          {# Language selector placeholder — wired up in Phase 3 #}
+          <div class="flex items-center gap-2">
+            <label for="lang-select-preview"
+                   class="font-mono text-label-sm text-[#c7c4d7]">Language</label>
+            <select id="lang-select-preview" class="input-base py-1 text-body-sm" style="width:auto;" disabled>
+              <option>Auto-detect</option>
+            </select>
+          </div>
+        </div>
+
+        {# Textarea placeholder #}
+        <div class="flex-1 flex flex-col mb-lg">
+          <label for="review-text-preview"
+                 class="font-mono text-label-sm text-[#c7c4d7] mb-2">Source Text</label>
+          <textarea id="review-text-preview"
+                    class="input-base flex-1 min-h-[260px] resize-none leading-relaxed"
+                    placeholder="Paste your review, article, or social media post here…"
+                    disabled>
+          </textarea>
+          <div class="flex justify-between mt-2">
+            <span class="font-mono text-label-sm text-[#c7c4d7]/50">⌘ Enter to analyze</span>
+            <span class="font-mono text-label-sm text-[#c7c4d7]/50">0 / 512</span>
+          </div>
+        </div>
+
+        {# Analyze button placeholder #}
+        <button class="btn-primary" disabled>
+          {{ ms_icon('bolt', size=16) }}
+          Analyze
+        </button>
+
+      </div>
+    </div>
+
+    {# ── Right: Results panel ─────────────────────────────────────────────── #}
+    <div class="lg:col-span-5 flex flex-col">
+      <div class="glass-panel rounded-xl flex flex-col h-full min-h-[420px] p-xl">
+
+        <div class="flex justify-between items-center mb-lg pb-md border-b border-white/[0.06]">
+          <h3 class="font-mono text-label-md text-[#c7c4d7] uppercase tracking-wider">
+            Analysis Results
+          </h3>
+        </div>
+
+        {# Phase 2 placeholder — replaced by HTMX partial in Phase 3 #}
+        <div id="result-panel" class="flex-1 flex">
+          {{ empty_state('psychology', 'Enter a review and click Analyze to see results') }}
+        </div>
+
+      </div>
+    </div>
+
+  </div>{# /grid #}
+
+  {# Phase 2 notice (removed in Phase 3) #}
+  <div class="card border-[#c0c1ff]/20 bg-[#c0c1ff]/5">
+    <div class="flex items-start gap-3">
+      {{ ms_icon('info', size=18, cls='text-[#c0c1ff] mt-0.5 flex-shrink-0') }}
+      <div>
+        <p class="text-body-md text-[#dae2fd] font-medium mb-1">Phase 2 Infrastructure</p>
+        <p class="text-body-sm text-[#c7c4d7]">
+          The layout shell is in place. The
+          <code class="font-mono text-[#c0c1ff] text-xs">POST /predict</code>
+          API endpoint is fully operational — HTMX interactions will be wired in Phase 3.
+          <a href="/docs#/Predict/predict_predict_post"
+             target="_blank"
+             class="text-[#c0c1ff] hover:underline ml-1">Test the API directly →</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,178 @@
+{#
+  macros/ui.html — Reusable Jinja2 macros for the SentimentAI dashboard.
+
+  WHY THIS FILE EXISTS
+  --------------------
+  The React components (Sidebar.jsx, Monitor.jsx, Analytics.jsx) defined small
+  helper components (MSIcon, StatusBadge, HealthChip, InfoRow) that were reused
+  across pages.  Jinja2 macros provide the equivalent pattern: define once,
+  import anywhere.
+
+  USAGE IN TEMPLATES
+  ------------------
+    {% from "macros/ui.html" import ms_icon, status_badge, health_chip, sentiment_badge %}
+
+  Each macro produces self-contained HTML with no JavaScript dependencies.
+  CSS classes reference app.css component classes (badge-*, highlight-*) and
+  Tailwind utilities from the CDN.
+#}
+
+{# ── Material Symbols Outlined icon ───────────────────────────────────────── #}
+{#
+  ms_icon(name, filled, size, cls)
+  ---------------------------------
+  Renders a Material Symbols Outlined icon span.
+
+  Parameters
+  ----------
+  name   : str   — icon name e.g. "psychology", "cloud_upload", "bolt"
+  filled : bool  — whether to use FILL=1 (solid) or FILL=0 (outlined)
+  size   : int   — font-size in px (default 20)
+  cls    : str   — extra CSS classes appended to the span
+#}
+{% macro ms_icon(name, filled=False, size=20, cls='') %}
+<span class="material-symbols-outlined {{ cls }}"
+      style="font-size: {{ size }}px; font-variation-settings: 'FILL' {{ 1 if filled else 0 }}, 'wght' {{ 400 if filled else 300 }};"
+      aria-hidden="true">{{ name }}</span>
+{% endmacro %}
+
+
+{# ── Status badge ─────────────────────────────────────────────────────────── #}
+{#
+  status_badge(status)
+  ---------------------
+  Renders a coloured badge for a batch job status.
+
+  status values: "completed" | "processing" | "queued" | "failed"
+#}
+{% macro status_badge(status) %}
+{% if status == 'completed' %}
+<span class="badge-positive">
+  <span class="badge-dot badge-dot--positive"></span>
+  Completed
+</span>
+{% elif status == 'processing' %}
+<span class="badge-processing">
+  <span class="badge-dot badge-dot--primary animate-pulse-slow"></span>
+  Processing
+</span>
+{% elif status == 'queued' %}
+<span class="badge-neutral">
+  <span class="badge-dot badge-dot--neutral"></span>
+  Queued
+</span>
+{% elif status == 'failed' %}
+<span class="badge-error">
+  <span class="badge-dot badge-dot--error"></span>
+  Failed
+</span>
+{% else %}
+<span class="badge-neutral">{{ status }}</span>
+{% endif %}
+{% endmacro %}
+
+
+{# ── Health chip ──────────────────────────────────────────────────────────── #}
+{#
+  health_chip(ok)
+  ----------------
+  Renders a "Healthy" or "Degraded" status chip.
+
+  ok : bool — True if the API health check returned status=="ok"
+#}
+{% macro health_chip(ok) %}
+{% if ok %}
+<span class="badge-positive">
+  <span class="badge-dot badge-dot--positive animate-pulse-slow"></span>
+  Healthy
+</span>
+{% else %}
+<span class="badge-error">
+  <span class="badge-dot badge-dot--error animate-pulse-slow"></span>
+  Degraded
+</span>
+{% endif %}
+{% endmacro %}
+
+
+{# ── Sentiment badge ──────────────────────────────────────────────────────── #}
+{#
+  sentiment_badge(sentiment)
+  ---------------------------
+  Renders the sentiment label for an aspect card.
+
+  sentiment values: "positive" | "negative" | "neutral" | "conflict"
+#}
+{% macro sentiment_badge(sentiment) %}
+{% if sentiment == 'positive' %}
+<span class="badge-positive">
+  <span class="badge-dot badge-dot--positive"></span>
+  {{ sentiment }}
+</span>
+{% elif sentiment == 'negative' %}
+<span class="badge-negative">
+  <span class="badge-dot badge-dot--negative"></span>
+  {{ sentiment }}
+</span>
+{% elif sentiment == 'conflict' %}
+<span class="badge-error">
+  <span class="badge-dot badge-dot--error"></span>
+  {{ sentiment }}
+</span>
+{% else %}
+<span class="badge-neutral">
+  <span class="badge-dot badge-dot--neutral"></span>
+  {{ sentiment }}
+</span>
+{% endif %}
+{% endmacro %}
+
+
+{# ── Info row (used on Monitor page) ─────────────────────────────────────── #}
+{#
+  info_row(label, value, value_cls)
+  -----------------------------------
+  Renders a labelled key-value cell inside the Model Configuration card.
+#}
+{% macro info_row(label, value, value_cls='') %}
+<div class="bg-[#0b1326] rounded-lg p-3">
+  <p class="font-mono text-[11px] text-[#c7c4d7] mb-1 uppercase tracking-wide">{{ label }}</p>
+  <p class="text-sm text-[#dae2fd] font-medium {{ value_cls }}">{{ value }}</p>
+</div>
+{% endmacro %}
+
+
+{# ── Loaded badge (aspect/sentiment model status) ────────────────────────── #}
+{% macro loaded_badge() %}
+<div class="flex items-center gap-1.5 text-sm text-[#dae2fd] font-medium">
+  {{ ms_icon('check_circle', filled=False, size=16, cls='text-[#4edea3]') }}
+  Loaded
+</div>
+{% endmacro %}
+
+
+{# ── Skeleton placeholder (used during HTMX loading states) ─────────────── #}
+{#
+  skeleton(height, width_cls)
+  ----------------------------
+  Renders a pulsing skeleton placeholder matching the React Skeleton component.
+#}
+{% macro skeleton(height='h-4', width_cls='w-full') %}
+<div class="animate-pulse bg-[#222a3d] rounded {{ height }} {{ width_cls }}"></div>
+{% endmacro %}
+
+
+{# ── Empty-state panel ────────────────────────────────────────────────────── #}
+{#
+  empty_state(icon, message)
+  ---------------------------
+  Centred icon + message for panels with no data yet.
+#}
+{% macro empty_state(icon='psychology', message='No data yet') %}
+<div class="flex flex-col items-center justify-center gap-4 py-16 text-[#c7c4d7]">
+  <span class="material-symbols-outlined opacity-30"
+        style="font-size: 48px; font-variation-settings: 'FILL' 0, 'wght' 200;"
+        aria-hidden="true">{{ icon }}</span>
+  <p class="text-sm opacity-60">{{ message }}</p>
+</div>
+{% endmacro %}

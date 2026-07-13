@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% from "macros/ui.html" import ms_icon, health_chip, info_row, loaded_badge %}
+
+{% block title %}System Monitor{% endblock %}
+{% block description %}Real-time API health, model metadata, and request statistics.{% endblock %}
+
+{% block content %}
+{#
+  Phase 2: Placeholder layout for the System Monitor page.
+
+  What this page will contain after Phase 5:
+    - API Status card        : live health chip polled via hx-trigger="every 30s"
+    - Model Configuration    : architecture, languages, model status
+    - Performance Metrics    : stat cards with SVG sparklines
+    - Recent Activity table  : last N API requests
+
+  All section structures below match Monitor.jsx exactly so Phase 5 only needs to
+  add live data and HTMX polling attributes.
+#}
+<div class="space-y-xl">
+
+  {# ── Page header ─────────────────────────────────────────────────────────── #}
+  <div class="flex flex-wrap justify-between items-end gap-4">
+    <div>
+      <h1 class="text-headline-md text-[#dae2fd]">System Monitor</h1>
+      <p class="mt-1 text-body-md text-[#c7c4d7]">
+        Real-time API health, model metadata, and request statistics.
+      </p>
+    </div>
+    <div class="flex items-center gap-2">
+      <label for="refresh-select" class="font-mono text-label-sm text-[#c7c4d7]">
+        Auto-refresh
+      </label>
+      <select id="refresh-select" class="input-base py-1 text-body-sm" style="width:auto;">
+        <option value="10000">10s</option>
+        <option value="30000" selected>30s</option>
+        <option value="60000">1m</option>
+        <option value="0">Off</option>
+      </select>
+    </div>
+  </div>
+
+  {# ── Health + Model config ────────────────────────────────────────────────── #}
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-xl">
+
+    {# API Status card #}
+    <div class="lg:col-span-4 card flex flex-col gap-lg">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 rounded-lg bg-[#4edea3]/10">
+          {{ ms_icon('monitor_heart', size=24, cls='text-[#4edea3]') }}
+        </div>
+        <div>
+          <h2 class="text-title-lg text-[#dae2fd]">API Status</h2>
+          <p class="font-mono text-label-sm text-[#c7c4d7]">Core Inference Engine</p>
+        </div>
+      </div>
+
+      {# Health status — HTMX polling target in Phase 5 #}
+      <div id="health-status"
+           class="flex items-center gap-3 pt-lg border-t border-white/[0.06]">
+        <span class="text-body-md text-[#c7c4d7]">Current state:</span>
+        {# Static placeholder — replaced by live fragment in Phase 5 #}
+        {{ health_chip(True) }}
+      </div>
+    </div>
+
+    {# Model Configuration card #}
+    <div class="lg:col-span-8 card">
+      <div class="flex items-center gap-3 mb-xl">
+        <div class="p-2.5 rounded-lg bg-[#c0c1ff]/10">
+          {{ ms_icon('memory', size=24, cls='text-[#c0c1ff]') }}
+        </div>
+        <div>
+          <h2 class="text-title-lg text-[#dae2fd]">Model Configuration</h2>
+          <p class="font-mono text-label-sm text-[#c7c4d7]">Loaded ONNX Graphs</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-md">
+        {{ info_row('Architecture',         'XLM-RoBERTa (INT8)') }}
+        {{ info_row('Supported Languages',  'English, Hindi, Hinglish') }}
+        <div class="bg-[#0b1326] rounded-lg p-3">
+          <p class="font-mono text-[11px] text-[#c7c4d7] mb-1 uppercase tracking-wide">Aspect Extraction</p>
+          {{ loaded_badge() }}
+        </div>
+        <div class="bg-[#0b1326] rounded-lg p-3">
+          <p class="font-mono text-[11px] text-[#c7c4d7] mb-1 uppercase tracking-wide">Sentiment Classification</p>
+          {{ loaded_badge() }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ── Performance metrics (stat cards) ─────────────────────────────────────── #}
+  <div>
+    <h2 class="text-headline-sm text-[#dae2fd] mb-lg">Performance Metrics</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-xl">
+
+      {# Macro-style stat card — defined inline since it's used only here #}
+      {% for stat in [
+        {'icon': 'database', 'label': 'Total Requests Today', 'value': '12.4k',  'sub': '↑ 8% vs yesterday', 'color': '#c0c1ff', 'positive': true},
+        {'icon': 'bolt',     'label': 'Avg Latency (P95)',    'value': '145ms',  'sub': 'Well within SLA',   'color': '#4edea3', 'positive': true},
+        {'icon': 'warning',  'label': 'Error Rate',           'value': '0.2%',   'sub': 'Last 24 hours',     'color': '#ffb4ab', 'positive': false},
+      ] %}
+      <div class="stat-card group">
+        {# Sparkline gradient background #}
+        <div class="absolute bottom-0 left-0 w-full h-16 opacity-40 group-hover:opacity-70
+                    transition-opacity pointer-events-none">
+          <svg viewBox="0 0 100 40" class="w-full h-full" preserveAspectRatio="none" aria-hidden="true">
+            <path d="{{ 'M0 40 L0 28 Q25 24 50 20 T100 14 L100 40 Z' if stat.positive else 'M0 40 L0 32 Q25 30 50 26 T100 22 L100 40 Z' }}"
+                  fill="{{ stat.color }}22"
+                  stroke="{{ stat.color }}"
+                  stroke-width="1.5"
+                  vector-effect="non-scaling-stroke" />
+          </svg>
+        </div>
+        <div class="relative z-10">
+          <div class="flex items-center gap-2 mb-lg">
+            <span class="material-symbols-outlined text-2xl"
+                  style="color: {{ stat.color }}; font-variation-settings: 'FILL' 1, 'wght' 400;"
+                  aria-hidden="true">{{ stat.icon }}</span>
+            <span class="font-mono text-label-md text-[#c7c4d7] uppercase tracking-wider">{{ stat.label }}</span>
+          </div>
+          <p class="text-display text-[#dae2fd] font-semibold">{{ stat.value }}</p>
+          <p class="font-mono text-label-sm text-[#c7c4d7] mt-1">{{ stat.sub }}</p>
+        </div>
+      </div>
+      {% endfor %}
+
+    </div>
+  </div>
+
+  {# ── Recent endpoint activity ──────────────────────────────────────────────── #}
+  <div class="card">
+    <h2 class="text-title-lg text-[#dae2fd] mb-lg">Recent Endpoint Activity</h2>
+    <div class="space-y-2" role="list" aria-label="Recent API requests">
+      {% for req in [
+        {'method': 'POST', 'path': '/predict',       'status': 200, 'time': '3.5ms',  'ago': '2s ago'},
+        {'method': 'GET',  'path': '/health',        'status': 200, 'time': '0.8ms',  'ago': '5s ago'},
+        {'method': 'POST', 'path': '/batch',         'status': 202, 'time': '12.1ms', 'ago': '1m ago'},
+        {'method': 'GET',  'path': '/status/abc12',  'status': 200, 'time': '1.2ms',  'ago': '1m ago'},
+        {'method': 'POST', 'path': '/predict',       'status': 500, 'time': '23ms',   'ago': '3m ago'},
+      ] %}
+      <div class="flex items-center gap-4 py-2 px-md rounded-lg hover:bg-white/[0.03] transition-colors"
+           role="listitem">
+        <span class="font-mono text-label-sm w-10 flex-shrink-0
+                     {{ 'text-[#c0c1ff]' if req.method == 'POST' else 'text-[#4edea3]' }}">
+          {{ req.method }}
+        </span>
+        <span class="font-mono text-body-sm text-[#dae2fd] flex-1 truncate">{{ req.path }}</span>
+        <span class="font-mono text-label-sm w-10 text-right flex-shrink-0
+                     {{ 'text-[#ffb4ab]' if req.status >= 500 else ('text-[#f5c542]' if req.status >= 400 else 'text-[#4edea3]') }}">
+          {{ req.status }}
+        </span>
+        <span class="font-mono text-label-sm text-[#c7c4d7] w-14 text-right flex-shrink-0">{{ req.time }}</span>
+        <span class="hidden sm:block font-mono text-label-sm text-[#c7c4d7]/50 w-16 text-right flex-shrink-0">
+          {{ req.ago }}
+        </span>
+      </div>
+      {% endfor %}
+    </div>
+
+    <p class="mt-4 font-mono text-label-sm text-[#c7c4d7]/50 text-center">
+      Phase 5 will add live polling from <code class="text-[#c0c1ff]">GET /health</code>.
+    </p>
+  </div>
+
+</div>
+{% endblock %}

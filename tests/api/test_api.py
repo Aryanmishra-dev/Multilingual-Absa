@@ -52,3 +52,20 @@ def test_batch_upload():
             assert data["status"] == "queued"
             assert data["total_reviews"] == 2
             mock_delay.assert_called_once()
+
+def test_info_endpoint():
+    with TestClient(app) as client:
+        response = client.get("/info")
+        assert response.status_code == 200
+        data = response.json()
+        assert "model_name" in data
+        assert "supported_languages" in data
+        assert isinstance(data["supported_languages"], str)
+
+def test_metrics_endpoint():
+    with TestClient(app) as client:
+        response = client.get("/metrics")
+        assert response.status_code == 200
+        # metrics returns plain text Prometheus data
+        assert "text/plain" in response.headers["content-type"]
+        assert "http_requests_total" in response.text

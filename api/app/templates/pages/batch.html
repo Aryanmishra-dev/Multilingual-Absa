@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% from "macros/ui.html" import ms_icon, status_badge, empty_state %}
+
+{% block title %}Batch Analytics{% endblock %}
+{% block description %}Upload a CSV of reviews for bulk aspect-based sentiment analysis.{% endblock %}
+
+{% block content %}
+{#
+  Phase 2: Placeholder layout for the Batch Analytics page.
+
+  What this page will contain after Phase 4:
+    - Upload zone  : drag-and-drop CSV input (HTML5 + Alpine.js drag events)
+    - Progress card: job status + progress bar polling via hx-trigger="every 2s"
+    - Recent table : DB-queried list of past batch jobs
+    - Charts       : post-completion AspectHeatmap, LanguagePie, SentimentChart
+                     (Chart.js, rendered with server-provided JSON data)
+
+  The page structure below mirrors Analytics.jsx exactly so Phase 4 only needs to
+  replace placeholder content with functional forms and HTMX targets.
+#}
+<div class="space-y-xl">
+
+  {# ── Page header ─────────────────────────────────────────────────────────── #}
+  <div>
+    <h1 class="text-headline-md text-[#dae2fd]">Batch Analytics</h1>
+    <p class="mt-1 text-body-md text-[#c7c4d7]">
+      Upload a CSV of reviews for bulk aspect-based sentiment analysis.
+    </p>
+  </div>
+
+  {# ── Upload zone placeholder ──────────────────────────────────────────────── #}
+  <section class="card" aria-label="File upload">
+    <div class="border-2 border-dashed border-white/[0.14] rounded-xl p-12
+                flex flex-col items-center justify-center text-center">
+      {{ ms_icon('cloud_upload', size=48, cls='text-[#c7c4d7] mb-4') }}
+      <h2 class="text-headline-sm text-[#dae2fd] mb-2">
+        Drag &amp; drop a CSV, or click to select
+      </h2>
+      <p class="text-body-md text-[#c7c4d7] max-w-sm">
+        Must contain a <code class="font-mono text-[#c0c1ff] px-1">text</code> column.
+        Maximum 10,000 rows. Files are deleted after analysis.
+      </p>
+    </div>
+
+    {# Phase 2 notice #}
+    <div class="mt-lg flex items-start gap-3 p-md rounded-lg bg-[#c0c1ff]/5 border border-[#c0c1ff]/20">
+      {{ ms_icon('info', size=18, cls='text-[#c0c1ff] mt-0.5 flex-shrink-0') }}
+      <div>
+        <p class="text-body-sm text-[#c7c4d7]">
+          File upload and batch processing are fully operational via
+          <code class="font-mono text-[#c0c1ff] text-xs">POST /batch</code>.
+          HTMX drag-and-drop UI and progress polling will be added in Phase 4.
+          <a href="/docs#/Predict/predict_batch_batch_post"
+             target="_blank"
+             class="text-[#c0c1ff] hover:underline ml-1">Test the API →</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {# ── Recent batches table placeholder ─────────────────────────────────────── #}
+  <section aria-label="Recent batch jobs">
+    <h2 class="text-headline-sm text-[#dae2fd] mb-lg">Recent Batches</h2>
+    <div class="card overflow-hidden p-0">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse" aria-label="Recent batch jobs">
+          <thead>
+            <tr class="border-b border-white/[0.08] bg-[#222a3d]/50">
+              <th scope="col" class="font-mono text-label-sm text-[#c7c4d7] py-3 px-xl">Filename</th>
+              <th scope="col" class="font-mono text-label-sm text-[#c7c4d7] py-3 px-lg">Rows</th>
+              <th scope="col" class="font-mono text-label-sm text-[#c7c4d7] py-3 px-lg">Status</th>
+              <th scope="col" class="font-mono text-label-sm text-[#c7c4d7] py-3 px-xl text-right">Date</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-white/[0.05]">
+            {# Phase 2: static mock rows matching React's Analytics.jsx mock data #}
+            {% for row in [
+              {'name': 'q3_customer_feedback.csv',  'rows': '4,250', 'status': 'completed',  'date': 'Today, 14:32'},
+              {'name': 'product_launch_tweets.csv', 'rows': '8,912', 'status': 'processing', 'date': 'Today, 14:15'},
+              {'name': 'corrupted_export_09.csv',   'rows': '—',     'status': 'failed',     'date': 'Yesterday'},
+            ] %}
+            <tr class="hover:bg-white/[0.03] transition-colors">
+              <td class="py-3 px-xl">
+                <div class="flex items-center gap-2 text-body-md text-[#dae2fd]">
+                  {{ ms_icon('description', size=16, cls='text-[#c7c4d7]') }}
+                  {{ row.name }}
+                </div>
+              </td>
+              <td class="py-3 px-lg font-mono text-body-sm text-[#c7c4d7]">{{ row.rows }}</td>
+              <td class="py-3 px-lg">{{ status_badge(row.status) }}</td>
+              <td class="py-3 px-xl text-right font-mono text-body-sm text-[#c7c4d7]">{{ row.date }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p class="mt-2 font-mono text-label-sm text-[#c7c4d7]/50 text-center">
+      Phase 4 will populate this table from the database.
+    </p>
+  </section>
+
+</div>
+{% endblock %}
