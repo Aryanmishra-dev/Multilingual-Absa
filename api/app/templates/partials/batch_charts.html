@@ -1,0 +1,114 @@
+{% if error %}
+<div class="card bg-error/10 border border-error/20 p-md rounded-lg text-center">
+  <p class="text-error font-medium">Failed to load charts: {{ error }}</p>
+</div>
+{% else %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-xl animate-fade-in" id="batch-charts-container">
+  
+  {# Aspect Heatmap (Stacked Bar) #}
+  <div class="xl:col-span-2 bg-[#222a3d] rounded-xl shadow-sm border border-white/[0.08] p-6 h-96">
+    <h3 class="text-sm font-semibold text-[#dae2fd] mb-4">Top Aspects by Sentiment</h3>
+    <div class="relative w-full h-[300px]">
+      <canvas id="aspectChart"></canvas>
+    </div>
+  </div>
+
+  {# Language Pie #}
+  <div class="bg-[#222a3d] rounded-xl shadow-sm border border-white/[0.08] p-6 h-96">
+    <h3 class="text-sm font-semibold text-[#dae2fd] mb-4">Language Distribution</h3>
+    <div class="relative w-full h-[300px]">
+      <canvas id="languageChart"></canvas>
+    </div>
+  </div>
+
+  {# Sentiment Chart (Line) #}
+  <div class="lg:col-span-2 xl:col-span-3 bg-[#222a3d] rounded-xl shadow-sm border border-white/[0.08] p-6 h-96">
+    <h3 class="text-sm font-semibold text-[#dae2fd] mb-4">Sentiment Over Time (Row Chunks)</h3>
+    <div class="relative w-full h-[300px]">
+      <canvas id="sentimentChart"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  (function() {
+    // Shared styling for dark mode
+    Chart.defaults.color = '#c7c4d7';
+    Chart.defaults.borderColor = 'rgba(255, 255, 255, 0.08)';
+    
+    // Data passed from backend
+    const rawAspect = {{ aspect_heatmap | safe }};
+    const rawLang = {{ language_pie | safe }};
+    const rawSent = {{ sentiment_chart | safe }};
+
+    // 1. Aspect Stacked Bar Chart (Horizontal)
+    const aspectCtx = document.getElementById('aspectChart');
+    if (aspectCtx && rawAspect.length > 0) {
+      new Chart(aspectCtx, {
+        type: 'bar',
+        data: {
+          labels: rawAspect.map(d => d.aspect),
+          datasets: [
+            { label: 'Positive', data: rawAspect.map(d => d.positive), backgroundColor: '#10B981' },
+            { label: 'Negative', data: rawAspect.map(d => d.negative), backgroundColor: '#EF4444' },
+            { label: 'Neutral',  data: rawAspect.map(d => d.neutral), backgroundColor: '#6B7280' },
+            { label: 'Conflict', data: rawAspect.map(d => d.conflict), backgroundColor: '#F59E0B' }
+          ]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: { x: { stacked: true }, y: { stacked: true } }
+        }
+      });
+    }
+
+    // 2. Language Pie Chart
+    const langCtx = document.getElementById('languageChart');
+    if (langCtx && rawLang.length > 0) {
+      new Chart(langCtx, {
+        type: 'pie',
+        data: {
+          labels: rawLang.map(d => d.name),
+          datasets: [{
+            data: rawLang.map(d => d.value),
+            backgroundColor: ['#3B82F6', '#F97316', '#10B981', '#8B5CF6'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
+      });
+    }
+
+    // 3. Sentiment Line Chart
+    const sentCtx = document.getElementById('sentimentChart');
+    if (sentCtx && rawSent.length > 0) {
+      new Chart(sentCtx, {
+        type: 'line',
+        data: {
+          labels: rawSent.map(d => d.name),
+          datasets: [
+            { label: 'Positive', data: rawSent.map(d => d.positive), borderColor: '#10B981', backgroundColor: '#10B981', tension: 0.3 },
+            { label: 'Negative', data: rawSent.map(d => d.negative), borderColor: '#EF4444', backgroundColor: '#EF4444', tension: 0.3 },
+            { label: 'Neutral',  data: rawSent.map(d => d.neutral), borderColor: '#6B7280', backgroundColor: '#6B7280', tension: 0.3 },
+            { label: 'Conflict', data: rawSent.map(d => d.conflict), borderColor: '#F59E0B', backgroundColor: '#F59E0B', tension: 0.3 }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
+    }
+  })();
+</script>
+{% endif %}

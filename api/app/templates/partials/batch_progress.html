@@ -39,6 +39,13 @@
 
     {% if job.status in ['queued', 'processing'] %}
     <div hx-get="/batch/progress/{{ job.job_id }}" hx-trigger="every 2s" hx-swap="outerHTML" hx-target="#batch-progress-container"></div>
+    {% elif job.status == 'completed' %}
+    <div class="mt-8" hx-get="/batch/charts/{{ job.job_id }}" hx-trigger="load" hx-swap="innerHTML">
+        <div class="flex items-center justify-center gap-2 text-[#c7c4d7]/70 font-mono text-sm py-8 animate-pulse">
+            <span class="material-symbols-outlined animate-spin" style="font-size:18px;">analytics</span>
+            Generating charts...
+        </div>
+    </div>
     {% endif %}
     {% endif %}
 </div>

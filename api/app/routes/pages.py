@@ -213,3 +213,72 @@ async def monitor_health_fragment(request: Request) -> HTMLResponse:
             "partials/monitor_health.html",
             {"request": request, "health": None, "error": str(e)}
         )
+
+import pandas as pd
+from pathlib import Path
+import json
+
+@router.get("/batch/charts/{job_id}", response_class=HTMLResponse)
+async def batch_charts_fragment(request: Request, job_id: str) -> HTMLResponse:
+    """
+    Phase 5.6: HTMX partial for rendering charts.
+    Parses the generated CSV and passes JSON directly to the template for Chart.js.
+    """
+    try:
+        file_path = Path(f"data/results/{job_id}.csv")
+        if not file_path.exists():
+            return templates.TemplateResponse("partials/batch_charts.html", {"request": request, "error": "CSV not found"})
+
+        df = pd.read_csv(file_path)
+
+        lang_pie = []
+        if "language" in df.columns:
+            counts = df["language"].value_counts().to_dict()
+            lang_pie = [{"name": str(k), "value": int(v)} for k, v in counts.items()]
+
+        aspect_heat = []
+        if "aspect" in df.columns and "sentiment" in df.columns:
+            # Group by aspect and sentiment
+            grouped = df.groupby(["aspect", "sentiment"]).size().unstack(fill_value=0)
+            for aspect, row in grouped.iterrows():
+                if pd.isna(aspect) or not aspect:
+                    continue
+                aspect_heat.append({
+                    "aspect": str(aspect),
+                    "positive": int(row.get("positive", 0)),
+                    "negative": int(row.get("negative", 0)),
+                    "neutral": int(row.get("neutral", 0)),
+                    "conflict": int(row.get("conflict", 0))
+                })
+
+        sent_line = []
+        if "sentiment" in df.columns:
+            df_sent = df[df["sentiment"].notna()]
+            n = len(df_sent)
+            # Create 7 chunks for the line chart
+            chunk_size = max(1, n // 7) if n > 0 else 1
+            for i in range(7):
+                chunk = df_sent.iloc[i*chunk_size : (i+1)*chunk_size]
+                if chunk.empty:
+                    break
+                counts = chunk["sentiment"].value_counts().to_dict()
+                sent_line.append({
+                    "name": f"Batch {i+1}",
+                    "positive": int(counts.get("positive", 0)),
+                    "negative": int(counts.get("negative", 0)),
+                    "neutral": int(counts.get("neutral", 0)),
+                    "conflict": int(counts.get("conflict", 0))
+                })
+
+        return templates.TemplateResponse(
+            "partials/batch_charts.html",
+            {
+                "request": request,
+                "language_pie": json.dumps(lang_pie),
+                "aspect_heatmap": json.dumps(aspect_heat),
+                "sentiment_chart": json.dumps(sent_line),
+                "error": None
+            }
+        )
+    except Exception as e:
+        return templates.TemplateResponse("partials/batch_charts.html", {"request": request, "error": str(e)})

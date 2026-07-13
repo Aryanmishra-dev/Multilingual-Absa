@@ -266,10 +266,43 @@ class TestBatchFragments:
 
     def test_download_endpoint_exists(self):
         with _html_client() as client:
-            # We don't have a guaranteed completed job to download, but we can verify 
-            # 404 is returned instead of 405 Method Not Allowed, meaning it exists.
             response = client.get("/results/download/fake-job-id")
             assert response.status_code == 404
+
+    def test_batch_charts_endpoint_handles_missing_file(self):
+        with _html_client() as client:
+            response = client.get("/batch/charts/fake-job-id")
+            assert response.status_code == 200
+            assert "text/html" in response.headers["content-type"]
+            assert "CSV not found" in response.text
+
+    def test_batch_charts_endpoint_valid_file(self, tmp_path):
+        import pandas as pd
+        from pathlib import Path
+        
+        # Create a mock CSV for a fake job
+        job_id = "test-job-charts"
+        test_file = Path(f"data/results/{job_id}.csv")
+        test_file.parent.mkdir(parents=True, exist_ok=True)
+        
+        df = pd.DataFrame({
+            "text": ["hello", "world"],
+            "language": ["en", "hi"],
+            "aspect": ["food", "service"],
+            "sentiment": ["positive", "negative"]
+        })
+        df.to_csv(test_file, index=False)
+        
+        try:
+            with _html_client() as client:
+                response = client.get(f"/batch/charts/{job_id}")
+                assert response.status_code == 200
+                assert "text/html" in response.headers["content-type"]
+                assert "chart.js" in response.text.lower()
+                assert "languageChart" in response.text
+        finally:
+            if test_file.exists():
+                test_file.unlink()
 
 class TestMonitorFragments:
     """Verify Phase 5 System Monitor HTMX endpoints."""
