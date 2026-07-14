@@ -1,111 +1,101 @@
 # Multilingual Aspect-Based Sentiment Analysis (ABSA)
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.111.0-00a393.svg)
-![React](https://img.shields.io/badge/HTMX-1.9-3d72d4.svg)
+![HTMX](https://img.shields.io/badge/HTMX-1.9-3d72d4.svg)
 ![DVC](https://img.shields.io/badge/DVC-3.51.1-945dd6.svg)
 ![MLflow](https://img.shields.io/badge/MLflow-2.13.0-0194E2.svg)
 
-A production-ready, highly optimized Aspect-Based Sentiment Analysis (ABSA) system designed to process multilingual product reviews in **English, Hindi, and Hinglish**. It accurately extracts aspects and classifies their underlying sentiments.
+This repository contains a multilingual Aspect-Based Sentiment Analysis system for English, Hindi, and Hinglish product reviews. It provides both a FastAPI JSON API and a server-rendered web UI backed by Jinja2 templates and HTMX interactions.
 
-The system leverages state-of-the-art models like **XLM-RoBERTa** and **IndicBERT**, optimized using ONNX runtime, and includes a highly robust, zero-download, pure-Python rule-based fallback engine for instant inference.
+The inference stack is centered on ONNX Runtime models, with a fallback pipeline for environments where the custom artifacts are not available. The project also includes DVC pipelines, MLflow tracking, Redis/Celery workers, PostgreSQL, and Prometheus/Grafana monitoring.
 
-## Key Features
+## What’s Included
 
-- **Multilingual Support**: First-class support for English, Hindi, and code-mixed Hinglish.
-- **Dual Inference Engine**:
-  - **Neural Path**: Uses custom fine-tuned, INT8-quantized ONNX models (XLM-RoBERTa based) for extremely fast and accurate token classification and sequence classification.
-  - **Rule-Based Fallback**: An instantaneous, pure-Python fallback leveraging a curated multi-lingual lexicon to handle aspect extraction and sentiment scoring without any heavy downloads.
-- **Modern Tech Stack**: 
-  - **Backend**: Asynchronous, high-performance API built with FastAPI.
-  - **Frontend**: A responsive dashboard built with FastAPI, Jinja2, HTMX, and TailwindCSS. Features real-time predictions, batch analytics, and system monitoring.
-- **MLOps Integrated**: Complete integration with DVC (Data Version Control) for pipeline reproducibility, MLflow for experiment tracking, and Evidently AI for data drift monitoring.
-- **Scalable Architecture**: Support for async tasks via Celery + Redis, robust data storage via PostgreSQL, and metric exporting using Prometheus.
+- Multilingual review processing for English, Hindi, and Hinglish.
+- FastAPI application with prediction, results, and monitoring routes.
+- Server-rendered UI available at `/predict`, `/batch`, and `/monitor`.
+- Batch processing, async task execution, and database-backed persistence.
+- DVC, MLflow, and monitoring assets for experiment and system tracking.
 
-## Python-First Architecture
-
-This repository is designed following a **Python-first paradigm**:
-- **Python (99%)**: Handling all business logic, data processing, configuration, API routing, ML inference, SSR (Server-Side Rendering) via Jinja2, and utility functions.
-- **JavaScript (1%)**: Strictly limited to Alpine.js for minimal client-side interactivity and Chart.js for visualization (loaded via CDN).
-- *Note: There is no decoupled SPA frontend (like React) or Node.js runtime required.*
-
-## Repository Structure
+## Repository Layout
 
 ```text
-Multilingual-Absa/
-├── api/app/                # FastAPI backend and inference services
-├── config/                 # Docker and application configuration files
-├── api/app/templates/      # Jinja2 HTMX frontend templates
-├── data/                   # Dataset directory (DVC-tracked)
-├── docs/                   # Extended documentation (architecture, ml, api)
-├── ml/                     # ML training, notebooks, MLflow, and tracking
-├── models/                 # Model artifacts (DVC-tracked)
-├── monitoring/             # Monitoring configurations (Prometheus, Evidently)
-├── scripts/                # Utility and automation scripts
-├── src/                    # Core Machine Learning pipeline source code
-├── tests/                  # Unit and integration test suite
-├── dvc.yaml                # DVC pipeline orchestration
-└── requirements.txt        # Python dependencies
+api/          FastAPI app, routes, middleware, schemas, services, templates
+config/       Docker and deployment configuration
+data/         Raw and processed datasets
+docs/         Architecture, API, deployment, and design notes
+ml/           Training notebooks and experimentation assets
+models/       Model artifacts, including ONNX assets
+monitoring/   Prometheus and Grafana configuration
+scripts/      Utility scripts for data, models, and monitoring
+src/          Core data, training, and evaluation code
+tests/        Test suite
+dashboard_backup/  Legacy React dashboard preserved as a backup
 ```
 
 ## Getting Started
 
 ### Prerequisites
+
 - Python 3.10+
+- Docker and Docker Compose if you want the full stack
 
-- Docker & Docker Compose (Optional, but recommended)
+### Local Setup
 
-### 1. Local Setup
-
-Clone the repository and install the backend dependencies:
 ```bash
 git clone <repository-url>
 cd Multilingual-Absa
 
-# Create a virtual environment and install dependencies
 python -m venv .venv
-source .venv/bin/activate  # On Windows use `.venv\Scripts\activate`
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Set up your environment variables:
-```bash
-cp .env.example .env
-# Edit .env with your specific configurations
-```
+If you use environment variables, create a local `.env` file before starting the app.
 
-### 2. Run with Docker (Recommended)
+### Run the App Locally
 
-The easiest way to get the entire stack (API, Dashboard, Redis, Postgres) running is via Docker Compose:
-```bash
-docker-compose -f deployment/docker/docker-compose.yml up --build
-```
-
-### 3. Manual ML Pipeline Execution (DVC)
-
-To reproduce the ML pipeline or sync artifacts:
-```bash
-dvc pull         # Pull data/models from remote storage
-dvc repro        # Run the full end-to-end ML training pipeline
-dvc push         # Push newly generated artifacts to remote
-```
-
-### 4. Running the Application Locally
-
-**Start the Application Server (API & Dashboard):**
 ```bash
 PYTHONPATH=. uvicorn api.app.main:app --reload --host 0.0.0.0 --port 8000
 ```
-- Access the dashboard at: `http://localhost:8000/predict`
-- API Documentation available at: `http://localhost:8000/docs`
 
-## How it Works
+Open:
 
-1. **Prediction API**: When a review is submitted, the language is auto-detected.
-2. **Inference**: The `ABSAPipeline` attempts to load INT8 quantized ONNX models for extraction and sentiment scoring. 
-3. **Fallback Mechanism**: If the custom models are not downloaded, the engine automatically falls back to a dictionary/rule-based engine tailored for product reviews, guaranteeing zero downtime and instant availability.
-4. **Monitoring**: All predictions are logged. Performance metrics and data drift are tracked via Evidently and Prometheus.
+- `http://localhost:8000/predict`
+- `http://localhost:8000/batch`
+- `http://localhost:8000/monitor`
+- `http://localhost:8000/docs`
+
+### Run with Docker
+
+```bash
+docker compose -f config/docker/docker-compose.yml up --build
+```
+
+That compose file starts the API, worker, PostgreSQL, Redis, Prometheus, Grafana, and the dashboard service.
+
+### Reproduce the ML Pipeline
+
+```bash
+dvc pull
+dvc repro
+dvc push
+```
+
+## How It Works
+
+1. A review is submitted through the API or web UI.
+2. The app detects or accepts the language and routes the request through the ABSA pipeline.
+3. The pipeline uses the available ONNX-backed models when present.
+4. If the model artifacts are missing, the system falls back to the rule-based path so inference can still continue.
+5. Predictions and runtime signals can be observed through the app, metrics endpoint, and monitoring stack.
+
+## Notes
+
+- The active web UI is served by the FastAPI app. `dashboard_backup/` is kept only as a legacy reference.
+- The main application entrypoint is `api.app.main:app`.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License. See the LICENSE file for details.
