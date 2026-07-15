@@ -1,15 +1,15 @@
 version: '3.8'
 
 services:
-  dashboard:
+  streamlit:
     build:
       context: ../../
-      dockerfile: config/docker/Dockerfile.dashboard
-    container_name: absa-dashboard
+      dockerfile: config/docker/Dockerfile.streamlit
+    container_name: absa-streamlit
     ports:
-      - "3000:80"
+      - "8501:8501"
     environment:
-      - VITE_API_URL=http://api:8000
+      - API_BASE_URL=http://api:8000
     depends_on:
       - api
 
