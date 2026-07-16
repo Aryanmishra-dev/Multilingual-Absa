@@ -63,27 +63,35 @@
   </div>
 
   {# ── Client-side Text Highlighting ── #}
-  {# We apply highlights using a small script so we don't need to change backend API #}
+  {# Uses DOM API to safely highlight aspect spans — never innerHTML with user data #}
   <script>
     (function() {
       const container = document.getElementById('annotated-text-container');
-      const text = container.textContent;
-      const aspects = {{ result.aspects | tojson | safe }};
+      const rawText = container.textContent;
+      const aspects = {{ result.aspects | tojson }};
       
       if (!aspects || aspects.length === 0) return;
       
-      // Sort aspects by start position descending to not mess up indices when replacing
-      aspects.sort((a, b) => b.start - a.start);
+      // Clear container and rebuild with DOM nodes
+      container.textContent = '';
+      const sorted = [...aspects].sort((a, b) => a.start - b.start);
+      let cursor = 0;
       
-      let html = text;
-      aspects.forEach(asp => {
-        const cssClass = 'highlight-' + asp.sentiment;
-        const before = html.substring(0, asp.start);
-        const match = html.substring(asp.start, asp.end);
-        const after = html.substring(asp.end);
-        html = before + '<span class="' + cssClass + '">' + match + '</span>' + after;
+      sorted.forEach((asp) => {
+        if (asp.start > cursor) {
+          container.appendChild(document.createTextNode(rawText.slice(cursor, asp.start)));
+        }
+        const span = document.createElement('span');
+        span.className = 'highlight-' + asp.sentiment;
+        span.textContent = rawText.slice(asp.start, asp.end);
+        span.title = asp.sentiment + ' \u00B7 ' + Math.round(asp.confidence * 100) + '%';
+        container.appendChild(span);
+        cursor = asp.end;
       });
-      container.innerHTML = html;
+      
+      if (cursor < rawText.length) {
+        container.appendChild(document.createTextNode(rawText.slice(cursor)));
+      }
     })();
   </script>
 

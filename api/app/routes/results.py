@@ -23,14 +23,22 @@ async def get_info() -> Dict[str, str]:
 from fastapi import HTTPException
 from fastapi.responses import FileResponse
 from pathlib import Path
+import re
+import os
+
+_RESULTS_DIR = Path("data/results").resolve()
 
 @router.get("/download/{job_id}")
 async def download_result(job_id: str):
-    file_path = Path(f"data/results/{job_id}.csv")
-    if not file_path.exists():
+    if not re.match(r'^[a-fA-F0-9\-]{36}$', job_id):
+        raise HTTPException(status_code=400, detail="Invalid job ID format")
+    resolved = (_RESULTS_DIR / f"{job_id}.csv").resolve()
+    if not str(resolved).startswith(str(_RESULTS_DIR)):
+        raise HTTPException(status_code=400, detail="Invalid job ID")
+    if not resolved.exists():
         raise HTTPException(status_code=404, detail="Result file not found")
     return FileResponse(
-        path=file_path,
+        path=resolved,
         filename=f"absa_results_{job_id}.csv",
         media_type="text/csv"
     )

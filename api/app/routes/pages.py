@@ -109,8 +109,8 @@ async def monitor_page(request: Request) -> HTMLResponse:
     try:
         health = await health_check()
         ctx = _base_ctx(request, "System Monitor", health=health, error=None)
-    except Exception as e:
-        ctx = _base_ctx(request, "System Monitor", health=None, error=str(e))
+    except Exception:
+        ctx = _base_ctx(request, "System Monitor", health=None, error="Service temporarily unavailable")
         
     return templates.TemplateResponse("pages/monitor.html", ctx)
 # ── Phase 3 HTMX Endpoints ───────────────────────────────────────────────────
@@ -141,10 +141,10 @@ async def predict_fragment(
             "partials/predict_result.html",
             {"request": request, "result": prediction, "error": None}
         )
-    except Exception as e:
+    except Exception:
         return templates.TemplateResponse(
             "partials/predict_result.html",
-            {"request": request, "result": None, "error": str(e)}
+            {"request": request, "result": None, "error": "Analysis failed. Please try again."}
         )
 
 # ── Phase 4 HTMX Endpoints ───────────────────────────────────────────────────
@@ -167,10 +167,10 @@ async def batch_fragment(
             "partials/batch_progress.html",
             {"request": request, "job": response, "error": None}
         )
-    except Exception as e:
+    except Exception:
         return templates.TemplateResponse(
             "partials/batch_progress.html",
-            {"request": request, "job": None, "error": str(e)}
+            {"request": request, "job": None, "error": "Batch processing failed. Please try again."}
         )
 
 @router.get("/batch/progress/{job_id}", response_class=HTMLResponse)
@@ -188,10 +188,10 @@ async def batch_progress_fragment(
             "partials/batch_progress.html",
             {"request": request, "job": job, "error": None}
         )
-    except Exception as e:
+    except Exception:
         return templates.TemplateResponse(
             "partials/batch_progress.html",
-            {"request": request, "job": None, "error": str(e)}
+            {"request": request, "job": None, "error": "Failed to retrieve job status."}
         )
 
 # ── Phase 5 HTMX Endpoints ───────────────────────────────────────────────────
@@ -208,10 +208,10 @@ async def monitor_health_fragment(request: Request) -> HTMLResponse:
             "partials/monitor_health.html",
             {"request": request, "health": health, "error": None}
         )
-    except Exception as e:
+    except Exception:
         return templates.TemplateResponse(
             "partials/monitor_health.html",
-            {"request": request, "health": None, "error": str(e)}
+            {"request": request, "health": None, "error": "Health check failed. Service may be unavailable."}
         )
 
 import pandas as pd
@@ -280,5 +280,5 @@ async def batch_charts_fragment(request: Request, job_id: str) -> HTMLResponse:
                 "error": None
             }
         )
-    except Exception as e:
-        return templates.TemplateResponse("partials/batch_charts.html", {"request": request, "error": str(e)})
+    except Exception:
+        return templates.TemplateResponse("partials/batch_charts.html", {"request": request, "error": "An unexpected error occurred while generating charts."})

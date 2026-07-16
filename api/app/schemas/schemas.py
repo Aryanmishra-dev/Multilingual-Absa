@@ -1,10 +1,10 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from typing import Optional, List
 
 
 class ReviewInput(BaseModel):
-    text: str
-    language: Optional[str] = None
+    text: str = Field(..., max_length=10000, description="Review text to analyze")
+    language: Optional[str] = Field(None, max_length=20, description="Language code (en, hi, hinglish, auto)")
 
     model_config = ConfigDict(from_attributes=True)
 

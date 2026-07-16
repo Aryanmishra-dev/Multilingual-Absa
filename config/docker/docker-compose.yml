@@ -21,10 +21,10 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://absa_user:absa_pass@postgres:5432/absa_db
-      - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
       - MODEL_PATH=models/onnx/
-      - MAX_BATCH_SIZE=10000
+      - MAX_BATCH_SIZE=${MAX_BATCH_SIZE:-10000}
     depends_on:
       - postgres
       - redis
@@ -39,8 +39,8 @@ services:
     container_name: absa-worker
     command: ["celery", "-A", "api.tasks", "worker", "--loglevel=info"]
     environment:
-      - DATABASE_URL=postgresql://absa_user:absa_pass@postgres:5432/absa_db
-      - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
       - MODEL_PATH=models/onnx/
     depends_on:
       - postgres
@@ -54,9 +54,9 @@ services:
     image: postgres:16-alpine
     container_name: absa-postgres
     environment:
-      - POSTGRES_USER=absa_user
-      - POSTGRES_PASSWORD=absa_pass
-      - POSTGRES_DB=absa_db
+      - POSTGRES_USER=${POSTGRES_USER:-absa_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?err}
+      - POSTGRES_DB=${POSTGRES_DB:-absa_db}
     ports:
       - "5432:5432"
     volumes:
@@ -84,7 +84,7 @@ services:
       - ../../monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
       - ../../monitoring/grafana/provisioning:/etc/grafana/provisioning
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?err}
       GF_USERS_ALLOW_SIGN_UP: "false"
 
 volumes:

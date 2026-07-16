@@ -28,9 +28,9 @@ def main():
         engine = create_engine(db_url)
         seven_days_ago = datetime.now() - timedelta(days=7)
         
-        # Load directly from SQLAlchemy using pandas
-        query = f"SELECT text, language FROM reviews WHERE created_at >= '{seven_days_ago.isoformat()}'"
-        curr_df = pd.read_sql(query, engine)
+        # Load directly from SQLAlchemy using pandas with parameterized query
+        query = "SELECT text, language FROM reviews WHERE created_at >= %(cutoff)s"
+        curr_df = pd.read_sql(query, engine, params={"cutoff": seven_days_ago})
     except Exception as e:
         print(f"Failed to fetch production data: {e}")
         curr_df = pd.DataFrame(columns=["text", "language"])

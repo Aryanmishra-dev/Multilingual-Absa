@@ -112,11 +112,18 @@ def process_batch(self, job_id: str, file_path: str):
         job.completed_at = datetime.now(timezone.utc)
         db.commit()
 
-    except Exception as e:
+    except Exception:
         job = db.query(BatchJob).filter(BatchJob.id == job_id).first()
         if job:
             job.status = "failed"
             db.commit()
-        raise e
+        import logging
+        logging.exception("Batch processing failed for job %s", job_id)
     finally:
+        # Clean up temp file
+        try:
+            if file_path and os.path.exists(file_path):
+                os.unlink(file_path)
+        except OSError:
+            pass
         db.close()
