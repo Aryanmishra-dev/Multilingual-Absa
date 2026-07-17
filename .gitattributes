@@ -1,2 +1,33 @@
+# .gitattributes - GitHub Linguist configuration for Multilingual-Absa
+
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# ==========================================
+# EXCLUSIONS FROM LANGUAGE STATISTICS
+# ==========================================
+
+# 1. Archived/Backup Dashboard Code
+# The dashboard_backup directory contains a legacy Vite/React application
+# including large minified JS assets in dist/, CSS, and vendored node_modules.
+# We exclude this entire directory to prevent archived code from dominating statistics.
+dashboard_backup/** linguist-generated=true
+
+# 2. IDE and Tooling Hooks
+# The .opencode directory contains generated JS hooks for the workspace environment.
+# These are internal tooling scripts and not part of the active application source code.
+.opencode/** linguist-generated=true
+
+# 3. Jupyter Notebooks
+# Notebooks are used for exploration and training on Colab, but the core active
+# application is the Python backend and FastAPI. Excluding these prevents notebooks
+# from misrepresenting the primary languages.
+ml/notebooks/*.ipynb linguist-generated=true
+
+# 4. Standard Build Artifacts & Vendored Dependencies
+# Ensures that any inadvertently committed build artifacts or vendor libraries
+# (like node_modules in subdirectories) do not skew language statistics.
+dist/** linguist-generated=true
+build/** linguist-generated=true
+node_modules/** linguist-generated=true
+**/node_modules/** linguist-generated=true
