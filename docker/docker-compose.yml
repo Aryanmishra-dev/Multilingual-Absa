@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    container_name: absa-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - MODEL_PATH=models/onnx/
+      - MAX_BATCH_SIZE=${MAX_BATCH_SIZE:-10000}
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ../models:/app/models
+      - ../data:/app/data
+
+  worker:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    container_name: absa-worker
+    command: ["celery", "-A", "app.tasks", "worker", "--loglevel=info"]
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
+      - MODEL_PATH=models/onnx/
+    depends_on:
+      - postgres
+      - redis
+      - api
+    volumes:
+      - ../models:/app/models
+      - ../data:/app/data
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: absa-postgres
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-absa_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?err}
+      - POSTGRES_DB=${POSTGRES_DB:-absa_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: absa-redis
+    ports:
+      - "6379:6379"
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports: ["9090:9090"]
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=15d"
+
+  grafana:
+    image: grafana/grafana:latest
+    ports: ["3001:3000"]
+    volumes:
+      - ../monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ../monitoring/grafana/provisioning:/etc/grafana/provisioning
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?err}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+
+volumes:
+  postgres_data:

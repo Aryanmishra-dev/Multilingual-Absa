@@ -1,0 +1,16 @@
+version: "3.9"
+services:
+  api:
+    image: ghcr.io/YOUR_USERNAME/multilingual-absa/api:latest
+    restart: always
+    environment:
+      - LOG_LEVEL=WARNING
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+  worker:
+    image: ghcr.io/YOUR_USERNAME/multilingual-absa/api:latest
+    command: celery -A api.tasks.batch_tasks worker --loglevel=warning
+    restart: always
+

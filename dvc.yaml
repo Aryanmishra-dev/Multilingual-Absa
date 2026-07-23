@@ -1,11 +1,11 @@
 stages:
   preprocess_semeval:
-    cmd: PYTHONPATH=. python src/data/dataset.py
+    cmd: PYTHONPATH=. python absa/data/dataset.py
     deps:
-      - src/data/dataset.py
-      - src/data/preprocess.py
-      - src/data/lang_detect.py
-      - src/data/transliterate.py
+      - absa/data/dataset.py
+      - absa/data/preprocess.py
+      - absa/data/lang_detect.py
+      - absa/data/transliterate.py
       - data/raw/semeval_restaurants
       - data/raw/semeval_laptops
     outs:
@@ -13,12 +13,12 @@ stages:
       - data/processed/semeval_test.jsonl
 
   preprocess_hindi:
-    cmd: PYTHONPATH=. python src/data/hindi_loader.py
+    cmd: PYTHONPATH=. python absa/data/hindi_loader.py
     deps:
-      - src/data/hindi_loader.py
-      - src/data/preprocess.py
-      - src/data/lang_detect.py
-      - src/data/transliterate.py
+      - absa/data/hindi_loader.py
+      - absa/data/preprocess.py
+      - absa/data/lang_detect.py
+      - absa/data/transliterate.py
       - data/raw/amazon_hindi/hindi_sentiment.jsonl
     outs:
       - data/processed/amazon_hindi.jsonl

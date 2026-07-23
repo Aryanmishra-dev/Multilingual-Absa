@@ -1,0 +1,38 @@
+# Stage 1: Builder
+FROM python:3.11-slim AS builder
+
+WORKDIR /app
+COPY requirements.txt .
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+# Stage 2: Runtime
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Copy dependencies
+COPY --from=builder /install /usr/local
+
+# Copy application code
+COPY app /app/app
+COPY scripts /app/scripts
+COPY absa /app/absa
+COPY docker /app/docker
+COPY .env.example /app/.env.example
+# .env is injected via docker-compose environment vars — no need to COPY it
+
+# Add a non-root user
+RUN adduser --disabled-password --gecos "" absauser \
+    && chown -R absauser /app
+
+USER absauser
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

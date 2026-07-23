@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from api.models.db_models import Base
+from app.schemas.db_models import Base
 
 def init_db():
     load_dotenv()

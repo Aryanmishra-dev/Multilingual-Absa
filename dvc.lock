@@ -1,0 +1,68 @@
+schema: '2.0'
+stages:
+  preprocess_semeval:
+    cmd: PYTHONPATH=. python absa/data/dataset.py
+    deps:
+    - path: data/raw/semeval_laptops
+      hash: md5
+      md5: 834bf3cc7b3d9216331adae54c9239c6.dir
+      size: 1104115
+      nfiles: 9
+    - path: data/raw/semeval_restaurants
+      hash: md5
+      md5: 07f540b34a0561f20908aaa70012defb.dir
+      size: 1625908
+      nfiles: 9
+    - path: absa/data/dataset.py
+      hash: md5
+      md5: 4199a5c7d112040180779168f7da1a4a
+      size: 2761
+    - path: absa/data/lang_detect.py
+      hash: md5
+      md5: ca10825874c1eeb68e199e0e178d8f94
+      size: 1053
+    - path: absa/data/preprocess.py
+      hash: md5
+      md5: c01401432dfeb6e32e928d47570caa21
+      size: 855
+    - path: absa/data/transliterate.py
+      hash: md5
+      md5: 2ab5e443eb6123188986e975586f42b8
+      size: 1404
+    outs:
+    - path: data/processed/semeval_test.jsonl
+      hash: md5
+      md5: 2c4581091b4aeb29a0734e44fd3a5656
+      size: 263576
+    - path: data/processed/semeval_train.jsonl
+      hash: md5
+      md5: 04b5486dc6a7c62d1289804bd373eeaa
+      size: 971123
+  preprocess_hindi:
+    cmd: PYTHONPATH=. python absa/data/hindi_loader.py
+    deps:
+    - path: data/raw/amazon_hindi/hindi_sentiment.jsonl
+      hash: md5
+      md5: 152317207b7015c46f6260a93c2cd756
+      size: 1140222
+    - path: absa/data/hindi_loader.py
+      hash: md5
+      md5: 6ffae4a0c61907d396b4e693beb6a23a
+      size: 1826
+    - path: absa/data/lang_detect.py
+      hash: md5
+      md5: ca10825874c1eeb68e199e0e178d8f94
+      size: 1053
+    - path: absa/data/preprocess.py
+      hash: md5
+      md5: c01401432dfeb6e32e928d47570caa21
+      size: 855
+    - path: absa/data/transliterate.py
+      hash: md5
+      md5: 2ab5e443eb6123188986e975586f42b8
+      size: 1404
+    outs:
+    - path: data/processed/amazon_hindi.jsonl
+      hash: md5
+      md5: 29825aafaee80993c9fcb89669bb27ce
+      size: 304642

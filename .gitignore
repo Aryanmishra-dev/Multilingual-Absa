@@ -46,8 +46,8 @@ data/processed/
 .ipynb_checkpoints/
 
 # Agent/IDE configs (optional — decide per tool)
-# .claude/
-# .opencode/
+.claude/
+.opencode/
 
 # OS
 .DS_Store

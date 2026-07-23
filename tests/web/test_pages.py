@@ -21,10 +21,12 @@ import os
 # Must be set before any app import (same pattern as tests/api/test_api.py)
 os.environ.setdefault("DATABASE_URL", "sqlite:///./tests/fixtures/test.db")
 
+from unittest import mock
+
 import pytest
 from fastapi.testclient import TestClient
 
-from api.app.main import app
+from app.main import app
 
 
 # ---------------------------------------------------------------------------
@@ -232,7 +234,8 @@ class TestBatchFragments:
     def test_batch_fragment_upload(self):
         with _html_client() as client:
             files = {"file": ("test.csv", b"text\nThis is great\nThis is bad", "text/csv")}
-            response = client.post("/batch/fragment", files=files)
+            with mock.patch("app.routes.predict.process_batch.delay"):
+                response = client.post("/batch/fragment", files=files)
         
         assert response.status_code == 200
         assert "text/html" in response.headers["content-type"]
@@ -242,7 +245,8 @@ class TestBatchFragments:
     def test_batch_fragment_invalid_file(self):
         with _html_client() as client:
             files = {"file": ("test.txt", b"text\nThis is great", "text/plain")}
-            response = client.post("/batch/fragment", files=files)
+            with mock.patch("app.routes.predict.process_batch.delay"):
+                response = client.post("/batch/fragment", files=files)
             
         assert response.status_code == 200
         assert "text/html" in response.headers["content-type"]
@@ -252,7 +256,8 @@ class TestBatchFragments:
         # 1. upload file to get job_id
         with _html_client() as client:
             files = {"file": ("test.csv", b"text\nHello", "text/csv")}
-            response1 = client.post("/batch/fragment", files=files)
+            with mock.patch("app.routes.predict.process_batch.delay"):
+                response1 = client.post("/batch/fragment", files=files)
             import re
             match = re.search(r'<span class="font-mono text-sm">([a-f0-9-]+)</span>', response1.text)
             assert match, "Could not find job_id in HTML"

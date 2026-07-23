@@ -1,7 +1,7 @@
 import os
 import urllib.request
 from datasets import load_dataset
-from src.config import DATA_DIR, RAW_DIR, FASTTEXT_MODEL_PATH
+from absa.config import DATA_DIR, RAW_DIR, FASTTEXT_MODEL_PATH
 
 def download_fasttext():
     url = "https://dl.fbaipublicfiles.com/fasttext/supervised-models/lid.176.ftz"

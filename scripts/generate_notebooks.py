@@ -49,11 +49,11 @@ def main():
         ("!git clone https://github.com/Aryanmishra-dev/Multilingual-Absa.git\n%cd Multilingual-Absa\n!pip install -r requirements.txt", "code"),
         ("# Mount Google Drive to save models and MLflow logs persistently\nfrom google.colab import drive\ndrive.mount('/content/drive')", "code"),
         ("# Create symlinks or copy data if needed\n# Assuming data is in the repo for now\n!mkdir -p /content/drive/MyDrive/ABSA_models", "code"),
-        ("# Prepare dataset\n!PYTHONPATH=. python src/data/hf_dataset.py", "code"),
-        ("# Run Aspect Extraction Training\n!PYTHONPATH=. python src/models/train_aspect_extraction.py", "code"),
-        ("# Run Sentiment Classification Training\n!PYTHONPATH=. python src/models/train_sentiment.py", "code"),
-        ("# Run Baseline as well\n!PYTHONPATH=. python src/models/baseline.py", "code"),
-        ("# Cross-lingual Evaluation\n!PYTHONPATH=. python src/evaluation/cross_lingual_eval.py", "code"),
+        ("# Prepare dataset\n!PYTHONPATH=. python absa/data/hf_dataset.py", "code"),
+        ("# Run Aspect Extraction Training\n!PYTHONPATH=. python absa/models/train_aspect_extraction.py", "code"),
+        ("# Run Sentiment Classification Training\n!PYTHONPATH=. python absa/models/train_sentiment.py", "code"),
+        ("# Run Baseline as well\n!PYTHONPATH=. python absa/models/baseline.py", "code"),
+        ("# Cross-lingual Evaluation\n!PYTHONPATH=. python absa/evaluation/cross_lingual_eval.py", "code"),
         ("# Copy models back to Drive\n!cp -r models/* /content/drive/MyDrive/ABSA_models/\n!cp -r mlflow /content/drive/MyDrive/ABSA_models/", "code")
     ]
     
